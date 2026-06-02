@@ -55,8 +55,8 @@ option{background:var(--bg2)}
 .btn-sm{padding:6px 14px;font-size:13px;border-radius:var(--rs);border:1px solid var(--border);background:var(--bg2);color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .15s;width:auto;margin-top:0}
 .btn-sm:active{transform:scale(.97)}
 /* tipo toggle */
-.tipo-toggle{display:flex;gap:6px;margin-bottom:8px}
-.tipo-btn{flex:1;padding:7px 6px;border-radius:var(--rs);border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center}
+.tipo-toggle{display:flex;gap:6px;margin-bottom:0}
+.tipo-btn{flex:1;padding:8px 6px;border-radius:var(--rs);border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center}
 .tipo-btn.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
 /* checkboxes aptos */
 .apto-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:100px;border:1.5px solid var(--border);background:var(--bg3);color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;margin:4px}
@@ -95,7 +95,7 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0}
 .empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
 .empty-icon{font-size:40px;margin-bottom:12px}
 .empty-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px}
-.overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:100;flex-direction:column;overflow-y:auto;padding:calc(env(safe-area-inset-top,0px)+20px) 20px 40px}
+.overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:100;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;box-sizing:border-box;padding-left:20px;padding-right:20px}
 .overlay.open{display:flex;flex-direction:column}
 .overlay-title{font-size:20px;font-weight:700;margin-bottom:20px}
 .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;padding:20px}
@@ -197,6 +197,7 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0}
 
 <!-- SETUP OVERLAY -->
 <div class="overlay" id="setup-overlay">
+  <div style="padding-top:calc(env(safe-area-inset-top,0px)+20px);padding-bottom:60px;min-height:100%">
   <div class="overlay-title">⚙️ Configuración</div>
   <div class="card">
     <div class="card-title">Servicios</div>
@@ -205,19 +206,21 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0}
   </div>
   <div class="card">
     <div class="card-title">Apartamentos</div>
-    <div style="font-size:11px;color:var(--hint);margin-bottom:10px">El <strong style="color:var(--accent)">primero</strong> es el apto principal (sin contador propio).</div>
+    <div style="font-size:11px;color:var(--hint);margin-bottom:12px">El <strong style="color:var(--accent)">primero</strong> es el apto principal (sin contador propio).</div>
     <div id="cfg-aptos-list"></div>
-    <button class="btn-sm" onclick="addApto()" style="margin-top:10px">+ Agregar apartamento</button>
+    <button class="btn-sm" onclick="addApto()" style="margin-top:12px">+ Agregar apartamento</button>
   </div>
-  <button class="btn btn-primary" onclick="saveSetup()">Guardar configuración</button>
-  <button class="btn btn-ghost" onclick="closeSetup()" style="margin-top:6px">Cancelar</button>
-  <hr style="margin:20px 0">
-  <div class="card-title" style="margin-bottom:10px">Respaldo de datos</div>
-  <button class="btn btn-ghost" onclick="exportarDatos()" style="margin-top:0;display:flex;align-items:center;justify-content:center;gap:8px">⬇️ Exportar datos</button>
-  <button class="btn btn-ghost" onclick="document.getElementById('import-input').click()" style="margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px">⬆️ Importar datos</button>
-  <input type="file" id="import-input" accept=".json" style="display:none" onchange="importarDatos(this)">
-  <div style="font-size:11px;color:var(--hint);margin-top:8px;text-align:center">El archivo exportado contiene toda tu configuración e historial</div>
+  <button class="btn btn-primary" onclick="saveSetup()" style="margin-top:8px">Guardar configuración</button>
+  <button class="btn btn-ghost" onclick="closeSetup()" style="margin-top:8px">Cancelar</button>
+  <div class="card" style="margin-top:20px">
+    <div class="card-title">Respaldo de datos</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Exporta tus datos para hacer un respaldo. Importa para restaurar desde un respaldo anterior.</div>
+    <button class="btn btn-ghost" onclick="exportarDatos()" style="margin-top:0;display:flex;align-items:center;justify-content:center;gap:8px">⬇️ Exportar datos</button>
+    <button class="btn btn-ghost" onclick="document.getElementById('import-input').click()" style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px">⬆️ Importar datos</button>
+    <input type="file" id="import-input" accept=".json" style="display:none" onchange="importarDatos(this)">
+  </div>
   <div style="height:40px"></div>
+  </div><!-- /inner -->
 </div>
 
 <!-- MODAL COMPARTIR -->
@@ -366,9 +369,9 @@ function buildSvcCard(s,i){
       <div style="display:flex;flex-wrap:wrap;margin:-4px">${rows}</div>
     </div>`;
   }
-  return `<div id="${svcCardId(s.id)}" style="background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:10px;margin-bottom:10px">
-    <div class="edit-list-item" style="margin-bottom:8px">
-      <span style="width:28px;height:28px;border-radius:50%;background:${col.color};display:inline-block;flex-shrink:0;cursor:pointer;border:2px solid ${col.color}" onclick="cycleSvcColor('${s.id}')" title="Cambiar color"></span>
+  return `<div id="${svcCardId(s.id)}" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px">
+    <div class="edit-list-item" style="margin-bottom:12px">
+      <span style="width:30px;height:30px;border-radius:50%;background:${col.color};display:inline-block;flex-shrink:0;cursor:pointer;box-shadow:0 0 0 3px var(--bg2),0 0 0 5px ${col.color}22" onclick="cycleSvcColor('${s.id}')" title="Cambiar color"></span>
       <input type="text" value="${s.label}" oninput="cfgSvcsTemp[${i}].label=this.value" placeholder="Nombre servicio">
       ${cfgSvcsTemp.length>1?`<button class="del-btn" onclick="delSvc('${s.id}')">×</button>`:''}
     </div>
