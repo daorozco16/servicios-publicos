@@ -211,6 +211,12 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0}
   </div>
   <button class="btn btn-primary" onclick="saveSetup()">Guardar configuración</button>
   <button class="btn btn-ghost" onclick="closeSetup()" style="margin-top:6px">Cancelar</button>
+  <hr style="margin:20px 0">
+  <div class="card-title" style="margin-bottom:10px">Respaldo de datos</div>
+  <button class="btn btn-ghost" onclick="exportarDatos()" style="margin-top:0;display:flex;align-items:center;justify-content:center;gap:8px">⬇️ Exportar datos</button>
+  <button class="btn btn-ghost" onclick="document.getElementById('import-input').click()" style="margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px">⬆️ Importar datos</button>
+  <input type="file" id="import-input" accept=".json" style="display:none" onchange="importarDatos(this)">
+  <div style="font-size:11px;color:var(--hint);margin-top:8px;text-align:center">El archivo exportado contiene toda tu configuración e historial</div>
   <div style="height:40px"></div>
 </div>
 
@@ -222,6 +228,18 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0}
     <textarea id="share-text" readonly style="width:100%;min-height:180px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;line-height:1.6;resize:none;outline:none"></textarea>
     <button onclick="copiarResumen()" style="width:100%;padding:12px;margin-top:10px;border-radius:var(--rs);border:none;background:var(--accent);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer" id="copy-btn">Copiar texto</button>
 
+  </div>
+</div>
+
+<!-- MODAL IMPORTAR CONFIRMACIÓN -->
+<div class="modal-backdrop" id="modal-import">
+  <div class="modal">
+    <div class="modal-title">⬆️ Importar datos</div>
+    <div class="modal-body" id="modal-import-body"></div>
+    <div class="modal-actions">
+      <button style="background:var(--bg3);color:var(--muted)" onclick="document.getElementById('modal-import').classList.remove('open')">Cancelar</button>
+      <button style="background:var(--accent);color:#fff" id="modal-import-confirm">Importar</button>
+    </div>
   </div>
 </div>
 
@@ -1077,6 +1095,64 @@ function copiarResumen(){
   } catch(e){
     document.execCommand('copy'); cerrar();
   }
+}
+
+/* ── EXPORTAR / IMPORTAR ── */
+function exportarDatos(){
+  const datos={
+    version:1,
+    fecha:new Date().toISOString(),
+    cfg:cfg,
+    historial:historial
+  };
+  const json=JSON.stringify(datos,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const hoy=new Date();
+  const nombre=`servicios-backup-${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}.json`;
+  const a=document.createElement('a');
+  a.href=url; a.download=nombre; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importarDatos(input){
+  const file=input.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const datos=JSON.parse(e.target.result);
+      if(!datos.cfg||!datos.historial){
+        alert('El archivo no es válido. Asegúrate de usar un archivo exportado desde esta app.');
+        input.value=''; return;
+      }
+      const nMeses=datos.historial.length;
+      const nAptos=datos.cfg.aptos?datos.cfg.aptos.length:0;
+      const nSvcs=datos.cfg.svcs?datos.cfg.svcs.length:0;
+      document.getElementById('modal-import-body').innerHTML=
+        `¿Reemplazar todos los datos actuales con el respaldo?<br><br>
+        <strong style="color:var(--text)">El archivo contiene:</strong><br>
+        • ${nAptos} apartamento${nAptos!==1?'s':''}<br>
+        • ${nSvcs} servicio${nSvcs!==1?'s':''}<br>
+        • ${nMeses} mes${nMeses!==1?'es':''} en el historial<br><br>
+        <span style="color:var(--danger)">⚠️ Esto reemplazará todos tus datos actuales.</span>`;
+      document.getElementById('modal-import-confirm').onclick=()=>{
+        cfg=datos.cfg;
+        historial=datos.historial;
+        persist();
+        document.getElementById('modal-import').classList.remove('open');
+        document.getElementById('setup-overlay').classList.remove('open');
+        input.value='';
+        initMes();
+        renderHistorial();
+        alert('✅ Datos importados correctamente.');
+      };
+      document.getElementById('modal-import').classList.add('open');
+    } catch(err){
+      alert('Error al leer el archivo. Asegúrate de que es un archivo JSON válido.');
+      input.value='';
+    }
+  };
+  reader.readAsText(file);
 }
 
 /* ── INIT ── */
