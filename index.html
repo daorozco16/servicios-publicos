@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Servicios">
 <meta name="theme-color" content="#0f172a">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>Servicios Públicos</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
@@ -109,16 +110,42 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0}
 .del-btn{width:32px;height:32px;border-radius:50%;border:1px solid rgba(248,113,113,0.3);background:rgba(248,113,113,0.1);color:var(--danger);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .del-btn:active{transform:scale(.95)}
 .tag-principal{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;background:var(--accent-bg);color:var(--accent);white-space:nowrap;flex-shrink:0}
-.det-table{width:100%;border-collapse:collapse;font-size:13px}
-.det-table th{font-size:11px;font-weight:600;color:var(--muted);text-align:left;padding:4px 0;border-bottom:1px solid var(--border)}
-.det-table td{padding:7px 0;border-bottom:1px solid var(--bg3);vertical-align:top}
-.det-table td:not(:first-child){text-align:right;font-family:'DM Mono',monospace}
+.det-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.det-table th{font-size:11px;font-weight:600;color:var(--muted);padding:4px 0 4px;border-bottom:1px solid var(--border);text-align:left}
+.det-table th:nth-child(2){text-align:right;width:28%}
+.det-table th:nth-child(3){text-align:right;width:28%}
+.det-table td{padding:7px 0;border-bottom:1px solid var(--bg3);vertical-align:middle;text-align:left}
+.det-table td:nth-child(2){text-align:right;font-family:'DM Mono',monospace}
+.det-table td:nth-child(3){text-align:right;font-family:'DM Mono',monospace}
 .det-table tr:last-child td{border-bottom:none}
+/* resumen mes actual */
+.resumen-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+.resumen-svc-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bg3);font-size:13px}
+.resumen-svc-row:last-child{border-bottom:none}
+.resumen-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.badge-ok{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;background:rgba(52,211,153,0.12);color:var(--success)}
+.badge-pendiente{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;background:rgba(251,191,36,0.12);color:var(--warn)}
+/* comparación */
+.cmp-up{color:var(--danger);font-size:11px;font-weight:600}
+.cmp-down{color:var(--success);font-size:11px;font-weight:600}
+.cmp-eq{color:var(--hint);font-size:11px}
+/* compartir */
+.share-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;margin-top:6px}
+.share-btn:active{background:var(--bg3)}
 /* vista por apto */
 .apto-hist-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px}
 .apto-hist-name{font-size:15px;font-weight:600;margin-bottom:10px}
-.apto-hist-mes-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bg3);font-size:13px}
-.apto-hist-mes-row:last-child{border-bottom:none}
+/* filtro de meses */
+.mes-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.mes-pill{padding:5px 12px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.mes-pill.active{background:var(--accent-bg);border-color:var(--accent);color:var(--text);font-weight:600}
+/* tarjeta de mes por apto */
+.mes-apto-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-bottom:8px}
+.mes-apto-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.mes-apto-title{font-size:14px;font-weight:600}
+.mes-apto-total{font-size:16px;font-weight:600;font-family:'DM Mono',monospace;color:var(--success)}
+.svc-breakdown{display:flex;gap:6px;flex-wrap:wrap}
+.svc-chip-small{padding:5px 10px;border-radius:var(--rs);font-size:12px;font-weight:500;background:var(--sb-bg);color:var(--sb-color);font-family:'DM Mono',monospace}
 </style>
 </head>
 <body>
@@ -133,11 +160,11 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0}
     </div>
   </div>
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('mes',this)">Mes actual</button>
-    <button class="tab" onclick="switchTab('hist',this)">Historial</button>
+    <button class="tab active" onclick="switchTab('hist',this)">Historial</button>
+    <button class="tab" onclick="switchTab('mes',this)">Registrar mes</button>
   </div>
   <div class="content">
-    <div id="tab-mes">
+    <div id="tab-mes" style="display:none">
       <div id="no-cfg" class="alert">⚠️ Configura los apartamentos y servicios usando el botón ⚙️</div>
       <div id="svc-selector-wrap" style="display:none">
         <div class="card-title" style="margin-bottom:8px">Selecciona el recibo</div>
@@ -145,7 +172,9 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0}
         <div id="svc-panel"></div>
       </div>
     </div>
-    <div id="tab-hist" style="display:none">
+    <div id="tab-hist">
+      <!-- Resumen mes actual -->
+      <div id="resumen-mes" style="display:none"></div>
       <div id="hist-empty" class="empty" style="display:none">
         <div class="empty-icon">📋</div>
         <div class="empty-title">Sin registros aún</div>
@@ -154,8 +183,8 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0}
       <!-- sub-pestañas historial -->
       <div id="hist-subtabs" style="display:none">
         <div class="subtabs">
-          <button class="subtab active" id="stab-recibos" onclick="switchSubtab('recibos',this)">Por recibo</button>
-          <button class="subtab" id="stab-aptos" onclick="switchSubtab('aptos',this)">Por apartamento</button>
+          <button class="subtab active" id="stab-aptos" onclick="switchSubtab('aptos',this)">Por apartamento</button>
+          <button class="subtab" id="stab-recibos" onclick="switchSubtab('recibos',this)">Por recibo</button>
         </div>
       </div>
       <div id="hist-list"></div>
@@ -183,6 +212,17 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0}
   <button class="btn btn-primary" onclick="saveSetup()">Guardar configuración</button>
   <button class="btn btn-ghost" onclick="closeSetup()" style="margin-top:6px">Cancelar</button>
   <div style="height:40px"></div>
+</div>
+
+<!-- MODAL COMPARTIR -->
+<div class="modal-backdrop" id="modal-share">
+  <div class="modal">
+    <div class="modal-title">📤 Compartir resumen</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Copia el texto y pégalo en WhatsApp</div>
+    <textarea id="share-text" readonly style="width:100%;min-height:180px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;line-height:1.6;resize:none;outline:none"></textarea>
+    <button onclick="copiarResumen()" style="width:100%;padding:12px;margin-top:10px;border-radius:var(--rs);border:none;background:var(--accent);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer" id="copy-btn">Copiar texto</button>
+
+  </div>
 </div>
 
 <!-- MODAL CONFIRMACIÓN -->
@@ -223,7 +263,7 @@ historial = [{mes, anio, data:{
 }}]
 */
 let cfg=null, historial=[], activeSvc=null, cfgSvcsTemp=[], cfgAptosTemp=[];
-let histSubtab='recibos';
+let histSubtab='aptos';
 
 function load(){
   try{cfg=JSON.parse(localStorage.getItem('spu4_cfg')||'null')}catch(e){cfg=null}
@@ -418,6 +458,10 @@ function initMes(){
 
 function selectSvc(sid){
   activeSvc=sid;
+  // Reset to current month when switching service
+  const hoy=new Date();
+  _panelMes=MESES[hoy.getMonth()];
+  _panelAnio=String(hoy.getFullYear());
   cfg.svcs.forEach(s=>{
     const btn=document.getElementById('selbtn-'+s.id); if(!btn)return;
     btn.className='svc-sel-btn'+(s.id===sid?' active':'');
@@ -426,15 +470,44 @@ function selectSvc(sid){
 }
 
 /* ── PANEL SERVICIO ── */
-function renderSvcPanel(sid){
+// Mes/año seleccionado actualmente en el formulario
+let _panelMes=null, _panelAnio=null;
+
+function renderSvcPanel(sid, mesInicial, anioInicial){
   const panel=document.getElementById('svc-panel');
   const s=cfg.svcs.find(x=>x.id===sid); if(!s)return;
   const hoy=new Date();
-  const mesActual=MESES[hoy.getMonth()], anioActual=String(hoy.getFullYear());
-  const entry=getEntry(mesActual,anioActual);
+  // Solo usar fecha actual si no se pasa un mes específico
+  const mes = mesInicial || _panelMes || MESES[hoy.getMonth()];
+  const anio = anioInicial || _panelAnio || String(hoy.getFullYear());
+  _panelMes=mes; _panelAnio=anio;
+
+  const entry=getEntry(mes,anio);
   const saved=entry&&entry.data&&entry.data[sid];
-  const mesesOpts=MESES.map(m=>`<option${m===mesActual?' selected':''}>${m}</option>`).join('');
+  const mesesOpts=MESES.map(m=>`<option${m===mes?' selected':''}>${m}</option>`).join('');
   const tipoPill=`<span class="tipo-pill ${s.tipo}">${s.tipo==='consumo'?'Consumo':'Partes iguales'}</span>`;
+
+  // Si ya está guardado y tiene pagos, mostrar resultado bloqueado
+  if(saved&&saved.pagos){
+    panel.innerHTML=`
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+        <span class="svc-badge" style="${svcColorStyle(s)}">${s.label}</span>
+        ${tipoPill}
+      </div>
+      <div class="row2" style="margin-bottom:12px">
+        <div class="field"><label>Mes</label><select id="p-mes" onchange="onMesCambio()">${mesesOpts}</select></div>
+        <div class="field"><label>Año</label><input type="number" id="p-anio" value="${anio}" min="2020" max="2035" onchange="onMesCambio()"></div>
+      </div>
+    </div>
+    <div style="padding:14px;border-radius:var(--rs);background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.25);color:var(--success);font-size:13px;margin-bottom:10px">
+      ✅ Este recibo ya fue registrado. Ver detalle en Historial.
+    </div>
+    <div id="p-resultado"></div>
+    <div style="height:env(safe-area-inset-bottom,20px)"></div>`;
+    renderResultadoSvc(sid,saved);
+    return;
+  }
 
   panel.innerHTML=`
   <div class="card">
@@ -444,13 +517,13 @@ function renderSvcPanel(sid){
     </div>
     <div class="row2" style="margin-bottom:12px">
       <div class="field"><label>Mes</label><select id="p-mes" onchange="onMesCambio()">${mesesOpts}</select></div>
-      <div class="field"><label>Año</label><input type="number" id="p-anio" value="${anioActual}" min="2020" max="2035" onchange="onMesCambio()"></div>
+      <div class="field"><label>Año</label><input type="number" id="p-anio" value="${anio}" min="2020" max="2035" onchange="onMesCambio()"></div>
     </div>
     <hr style="margin-bottom:14px">
     <div class="card-title">Datos del recibo</div>
-    <div class="field"><label>Valor total ($)</label><input type="number" id="p-total" inputmode="decimal" placeholder="0" value="${saved?saved.total:''}"></div>
+    <div class="field"><label>Valor total ($)</label><input type="number" id="p-total" inputmode="decimal" placeholder="0"></div>
     ${s.tipo==='consumo'?`
-    <div class="field"><label>Consumo total (unid.)</label><input type="number" id="p-cons" inputmode="decimal" placeholder="0" value="${saved?saved.cons:''}"></div>
+    <div class="field"><label>Consumo total (unid.)</label><input type="number" id="p-cons" inputmode="decimal" placeholder="0"></div>
     <hr style="margin-bottom:14px">
     <div class="card-title">Lecturas contadores internos</div>
     <div class="info-box" style="margin-bottom:12px">
@@ -470,11 +543,10 @@ function renderSvcPanel(sid){
   <div style="height:env(safe-area-inset-bottom,20px)"></div>`;
 
   if(s.tipo==='consumo'){
-    renderContadoresPanel(sid,mesActual,anioActual,saved);
+    renderContadoresPanel(sid,mes,anio,saved);
   } else {
     renderPartesPanel(s,saved);
   }
-  if(saved&&saved.pagos) renderResultadoSvc(sid,saved);
 }
 
 function renderPartesPanel(s,saved){
@@ -496,17 +568,12 @@ function renderPartesPanel(s,saved){
 
 function onMesCambio(){
   const sid=activeSvc; if(!sid)return;
-  const s=cfg.svcs.find(x=>x.id===sid); if(!s)return;
   const mes=document.getElementById('p-mes').value;
   const anio=document.getElementById('p-anio').value;
-  const entry=getEntry(mes,anio);
-  const saved=entry&&entry.data&&entry.data[sid];
-  if(s.tipo==='consumo') renderContadoresPanel(sid,mes,anio,saved);
-  const resEl=document.getElementById('p-resultado');
-  if(resEl){if(saved&&saved.pagos)renderResultadoSvc(sid,saved);else resEl.style.display='none';}
-  if(document.getElementById('p-total')) document.getElementById('p-total').value=saved?saved.total:'';
-  if(document.getElementById('p-cons')) document.getElementById('p-cons')&&(document.getElementById('p-cons').value=saved?saved.cons:'');
+  _panelMes=mes; _panelAnio=anio;
+  renderSvcPanel(sid, mes, anio);
 }
+
 
 function getPrevLectura(sid,aptoId,mes,anio){
   const mi=MESES.indexOf(mes), an=parseInt(anio);
@@ -564,8 +631,8 @@ function guardarSvc(){
   limpiarError();
   const sid=activeSvc;
   const s=cfg.svcs.find(x=>x.id===sid); if(!s)return;
-  const mes=document.getElementById('p-mes').value;
-  const anio=document.getElementById('p-anio').value;
+  const mes=_panelMes;
+  const anio=_panelAnio;
   const totalEl=document.getElementById('p-total');
   const total=parseFloat(totalEl?totalEl.value:'')||0;
   let errores=[], erEls=[];
@@ -581,7 +648,6 @@ function guardarSvc(){
     const parteVal=Math.round(total/participantes.length);
     const pagos={};
     participantes.forEach(aid=>{pagos[aid]=parteVal;});
-    // Ajuste de centavos en el primero por redondeo
     const suma=Object.values(pagos).reduce((a,v)=>a+v,0);
     if(suma!==Math.round(total)&&participantes.length){pagos[participantes[0]]+=Math.round(total)-suma;}
     svcData={tipo:'partes',total,aptosPartes:participantes,pagos};
@@ -604,6 +670,19 @@ function guardarSvc(){
       lecturas[apto.id]={ant,act,consumo:Math.max(0,act-ant)};
     });
     const consumoContadores=Object.values(lecturas).reduce((a,l)=>a+l.consumo,0);
+    // Validar que la suma de consumos de los contadores no supere el total
+    if(consumoContadores>cons){
+      cfg.aptos.slice(1).forEach(apto=>{
+        const actEl=document.getElementById('lec-'+apto.id+'-act');
+        const antEl=document.getElementById('lec-'+apto.id+'-ant');
+        if(actEl) actEl.classList.add('err');
+        if(antEl&&!antEl.disabled) antEl.classList.add('err');
+      });
+      const consEl=document.getElementById('p-cons');
+      if(consEl) consEl.classList.add('err');
+      mostrarError('La suma de consumos de los contadores ('+consumoContadores.toFixed(2)+' unid.) supera el consumo total del recibo ('+cons.toFixed(2)+' unid.). Verifica las lecturas de cada apartamento.');
+      return;
+    }
     const consumoPrincipal=Math.max(0,cons-consumoContadores);
     const pagos={};
     pagos[cfg.aptos[0].id]=Math.round(consumoPrincipal*tarifa);
@@ -623,7 +702,6 @@ function renderResultadoSvc(sid,svcData){
   const res=document.getElementById('p-resultado'); if(!res||!s)return;
   res.style.display='block';
   let rows='';
-
   if(svcData.tipo==='partes'){
     const participantes=svcData.aptosPartes||[];
     const n=participantes.length;
@@ -637,7 +715,7 @@ function renderResultadoSvc(sid,svcData){
       </div>`;
     });
     res.innerHTML=`<div class="grand-card" style="margin-top:6px">
-      <div><div class="grand-label">${s.icon} ${s.label} — total recibo</div><div class="grand-label" style="font-size:11px">➗ Dividido en ${n} partes iguales</div></div>
+      <div><div class="grand-label">${s.label} — total recibo</div><div class="grand-label" style="font-size:11px">➗ Dividido en ${n} partes iguales</div></div>
       <div class="grand-val">$${fmt(svcData.total)}</div>
     </div>${rows}`;
   } else {
@@ -655,7 +733,7 @@ function renderResultadoSvc(sid,svcData){
       </div>`;
     });
     res.innerHTML=`<div class="grand-card" style="margin-top:6px">
-      <div><div class="grand-label">${s.icon} ${s.label} — total recibo</div><div class="grand-label" style="font-size:11px">Tarifa $${fmt(svcData.tarifa)}/unid. · ${fmtDec(svcData.cons)} unid.</div></div>
+      <div><div class="grand-label">${s.label} — total recibo</div><div class="grand-label" style="font-size:11px">Tarifa $${fmt(svcData.tarifa)}/unid. · ${fmtDec(svcData.cons)} unid.</div></div>
       <div class="grand-val">$${fmt(svcData.total)}</div>
     </div>${rows}`;
   }
@@ -664,9 +742,52 @@ function renderResultadoSvc(sid,svcData){
 /* ── HISTORIAL ── */
 function getEntry(mes,anio){return historial.find(h=>h.mes===mes&&String(h.anio)===String(anio))||null}
 
+function renderResumenMes(){
+  const el=document.getElementById('resumen-mes'); if(!el||!cfg)return;
+  const hoy=new Date();
+  const mes=MESES[hoy.getMonth()], anio=String(hoy.getFullYear());
+  const entry=getEntry(mes,anio);
+  const col=svcColor(cfg.svcs[0]||{colorIdx:0});
+
+  // Qué servicios están registrados y cuáles faltan
+  const rows=cfg.svcs.map(s=>{
+    const ok=entry&&entry.data&&entry.data[s.id]&&entry.data[s.id].pagos;
+    const sc=svcColor(s);
+    return `<div class="resumen-svc-row">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="resumen-dot" style="background:${sc.color}"></span>
+        <span>${s.label}</span>
+      </div>
+      <span class="${ok?'badge-ok':'badge-pendiente'}">${ok?'Registrado':'Pendiente'}</span>
+    </div>`;
+  }).join('');
+
+  const totalMes=entry?Object.keys(entry.data||{}).reduce((a,sid)=>{const d=entry.data[sid];return a+(d?d.total:0)},0):0;
+  const registrados=cfg.svcs.filter(s=>entry&&entry.data&&entry.data[s.id]&&entry.data[s.id].pagos).length;
+  const pendientes=cfg.svcs.length-registrados;
+
+  el.style.display='block';
+  el.innerHTML=`<div class="resumen-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">Mes actual</div>
+        <div style="font-size:16px;font-weight:600;margin-top:2px">${mes} ${anio}</div>
+      </div>
+      <div style="text-align:right">
+        ${pendientes>0
+          ?`<span class="badge-pendiente">${pendientes} pendiente${pendientes>1?'s':''}</span>`
+          :`<span class="badge-ok">✓ Completo</span>`}
+        ${totalMes>0?`<div style="font-size:15px;font-weight:600;font-family:'DM Mono',monospace;color:var(--success);margin-top:4px">$${fmt(totalMes)}</div>`:''}
+      </div>
+    </div>
+    ${rows}
+  </div>`;
+}
+
 function renderHistorial(){
   const empty=document.getElementById('hist-empty');
   const subtabs=document.getElementById('hist-subtabs');
+  renderResumenMes();
   if(!historial.length){
     empty.style.display='block';
     subtabs.style.display='none';
@@ -676,8 +797,19 @@ function renderHistorial(){
   }
   empty.style.display='none';
   subtabs.style.display='block';
-  if(histSubtab==='recibos') renderListadoMeses();
-  else renderPorApto();
+  if(histSubtab==='aptos') renderPorApto();
+  else renderListadoMeses();
+}
+
+function switchSubtab(id,btn){
+  histSubtab=id;
+  document.querySelectorAll('.subtab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('hist-list').style.display='none';
+  document.getElementById('hist-detail').style.display='none';
+  document.getElementById('hist-by-apto').style.display='none';
+  if(id==='aptos') renderPorApto();
+  else renderListadoMeses();
 }
 
 function renderListadoMeses(){
@@ -690,12 +822,88 @@ function renderListadoMeses(){
     const sids=Object.keys(h.data||{});
     const totalGen=sids.reduce((a,sid)=>{const d=h.data[sid];return a+(d?d.total:0)},0);
     const svcsLabels=sids.map(sid=>{const s=cfg&&cfg.svcs.find(x=>x.id===sid);return s?s.label:sid}).join(' · ');
-    list.innerHTML+=`<div class="hist-item" onclick="verDetalle(${i})">
-      <div><div class="hist-mes">${h.mes} ${h.anio}</div><div class="hist-sub">${svcsLabels||'Sin datos'}</div></div>
-      <div style="display:flex;align-items:center;gap:8px"><div class="hist-total">$${fmt(totalGen)}</div><div style="font-size:18px;color:var(--hint)">›</div></div>
+    const isOpen=_acordeonAbierto===i;
+    const chevron=isOpen?'↑':'↓';
+
+    list.innerHTML+=`<div id="acord-${i}" style="margin-bottom:8px">
+      <div class="hist-item" style="margin-bottom:0;border-radius:${isOpen?'var(--r) var(--r) 0 0':'var(--r)'}" onclick="verDetalle(${i})">
+        <div><div class="hist-mes">${h.mes} ${h.anio}</div><div class="hist-sub">${svcsLabels||'Sin datos'}</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="hist-total">$${fmt(totalGen)}</div>
+          <div style="font-size:14px;color:var(--hint);font-weight:600">${chevron}</div>
+        </div>
+      </div>
+      ${isOpen?buildDetalleInline(i,h):''}
     </div>`;
   });
 }
+
+function buildDetalleInline(idx,h){
+  const sids=Object.keys(h.data||{});
+  const totalGen=sids.reduce((a,sid)=>{const d=h.data[sid];return a+(d?d.total:0)},0);
+  // Comparación mes anterior
+  const hMesIdx=MESES.indexOf(h.mes), hAnio=parseInt(h.anio);
+  const prevMes=hMesIdx===0?MESES[11]:MESES[hMesIdx-1];
+  const prevAnio=hMesIdx===0?hAnio-1:hAnio;
+  const prevEntry=getEntry(prevMes,String(prevAnio));
+  const prevTotal=prevEntry?Object.keys(prevEntry.data||{}).reduce((a,sid)=>{const d=prevEntry.data[sid];return a+(d?d.total:0)},0):null;
+  const diffTotal=prevTotal!==null?totalGen-prevTotal:null;
+  const cmpHtml=diffTotal!==null
+    ?(diffTotal>0?`<span class="cmp-up">↑ $${fmt(Math.abs(diffTotal))} vs ${prevMes}</span>`
+      :diffTotal<0?`<span class="cmp-down">↓ $${fmt(Math.abs(diffTotal))} vs ${prevMes}</span>`
+      :`<span class="cmp-eq">= igual que ${prevMes}</span>`):'';
+
+  let html=`<div style="background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r) var(--r);padding:14px 16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="grand-label">Total${cmpHtml?` · ${cmpHtml}`:''}</div>
+      <div style="font-size:17px;font-weight:600;font-family:'DM Mono',monospace;color:var(--text)">$${fmt(totalGen)}</div>
+    </div>
+    <button class="btn-sm" style="color:var(--danger);border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.08);margin-bottom:12px" onclick="confirmarEliminarMes(${idx})">🗑️ Eliminar mes completo</button>`;
+
+  sids.forEach(sid=>{
+    const s=cfg&&cfg.svcs.find(x=>x.id===sid);
+    const d=h.data[sid]; if(!d)return;
+    const label=s?s.label:sid;
+    const colorStyle=s?svcColorStyle(s):'';
+    const isPartes=d.tipo==='partes';
+    html+=`<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="svc-badge" style="${colorStyle}">${label}</span>
+          ${isPartes?`<span style="font-size:11px;color:var(--muted)">➗ ${(d.aptosPartes||[]).length} partes</span>`:`<span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">$${fmt(d.tarifa)}/u</span>`}
+        </div>
+        <button class="btn-sm" style="color:var(--danger);border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.08);font-size:11px" onclick="confirmarEliminarSvc(${idx},'${sid}')">🗑️</button>
+      </div>
+      <table class="det-table">
+        <thead><tr><th>Apartamento</th>${isPartes?'<th>Parte</th>':'<th>Unidades</th>'}<th>A pagar</th></tr></thead>
+        <tbody>`;
+    if(isPartes){
+      const participantes=d.aptosPartes||[];
+      const n=participantes.length;
+      cfg.aptos.forEach(apto=>{
+        if(!participantes.includes(apto.id))return;
+        const isPrincipal=apto.id===cfg.aptos[0].id;
+        html+=`<tr><td>${apto.label}${isPrincipal?'<span class="principal-badge" style="font-size:9px">principal</span>':''}</td><td>1/${n}</td><td style="color:var(--success);font-weight:600">$${fmt(d.pagos[apto.id]||0)}</td></tr>`;
+      });
+    } else {
+      html+=`<tr><td>${cfg.aptos[0].label} <span class="principal-badge" style="font-size:9px">principal</span></td><td>${fmtDec(d.consumoPrincipal)}</td><td style="color:var(--success);font-weight:600">$${fmt(d.pagos[cfg.aptos[0].id]||0)}</td></tr>`;
+      cfg.aptos.slice(1).forEach(apto=>{
+        const lec=d.lecturas&&d.lecturas[apto.id]||{};
+        html+=`<tr><td>${apto.label}</td><td>${fmtDec(lec.consumo||0)}</td><td style="color:var(--success);font-weight:600">$${fmt(d.pagos[apto.id]||0)}</td></tr>`;
+      });
+    }
+    html+=`</tbody><tfoot><tr style="border-top:1px solid var(--border)">
+      <td style="font-weight:600;padding-top:8px">Total</td>
+      <td style="padding-top:8px;color:var(--muted)">${isPartes?'':fmtDec(d.cons)+' unid.'}</td>
+      <td style="padding-top:8px;font-weight:600;font-family:'DM Mono',monospace">$${fmt(d.total)}</td>
+    </tr></tfoot></table></div>`;
+  });
+  html+=`</div>`;
+  return html;
+}
+
+/* filtro global para la vista por apto */
+let _filtroGlobal='todos';
 
 function renderPorApto(){
   document.getElementById('hist-list').style.display='none';
@@ -704,146 +912,105 @@ function renderPorApto(){
   c.style.display='block'; c.innerHTML='';
   if(!cfg)return;
 
-  // Todos los meses ordenados cronológicamente
   const mesesOrdenados=[...historial].sort((a,b)=>{
     const ai=MESES.indexOf(a.mes)+parseInt(a.anio)*12;
     const bi=MESES.indexOf(b.mes)+parseInt(b.anio)*12;
     return ai-bi;
   });
 
+  // Filtro global — un solo set de pills arriba de todos los aptos
+  const pillTodos=`<button class="mes-pill${_filtroGlobal==='todos'?' active':''}" onclick="setFiltroGlobal('todos')">Todos</button>`;
+  const pillsMeses=mesesOrdenados.map(h=>{
+    const key=h.mes+'_'+h.anio;
+    return `<button class="mes-pill${_filtroGlobal===key?' active':''}" onclick="setFiltroGlobal('${key}')">${h.mes.slice(0,3)} ${h.anio}</button>`;
+  }).join('');
+
+  c.innerHTML=`<div class="mes-filter" style="margin-bottom:16px">${pillTodos}${pillsMeses}</div>`;
+
+  const mesesFiltrados=_filtroGlobal==='todos'
+    ? mesesOrdenados
+    : mesesOrdenados.filter(h=>h.mes+'_'+h.anio===_filtroGlobal);
+
   cfg.aptos.forEach((apto,ai)=>{
     const isPrincipal=ai===0;
-    let filas='';
-    let totalApto=0;
+
+    // Total acumulado siempre sobre todos los meses
+    let totalAcumulado=0;
     mesesOrdenados.forEach(h=>{
-      const sids=Object.keys(h.data||{});
-      let totalMesApto=0;
-      sids.forEach(sid=>{
+      Object.keys(h.data||{}).forEach(sid=>{
         const d=h.data[sid]; if(!d||!d.pagos)return;
-        totalMesApto+=d.pagos[apto.id]||0;
+        totalAcumulado+=d.pagos[apto.id]||0;
       });
-      if(totalMesApto>0||sids.length>0){
-        totalApto+=totalMesApto;
-        // Detalle por servicio en ese mes
-        const detalleServs=sids.map(sid=>{
-          const d=h.data[sid]; if(!d||!d.pagos)return'';
-          const sv=cfg.svcs.find(x=>x.id===sid);
-          const val=d.pagos[apto.id]||0;
-          if(!val)return'';
-          return `<span style="font-size:11px;color:var(--muted)">${sv?sv.label:sid}: $${fmt(val)}</span>`;
-        }).filter(Boolean).join('  ');
-        filas+=`<div class="apto-hist-mes-row">
-          <div>
-            <div>${h.mes} ${h.anio}</div>
-            ${detalleServs?`<div style="margin-top:2px">${detalleServs}</div>`:''}
-          </div>
-          <div style="font-weight:600;font-family:'DM Mono',monospace;color:var(--success)">$${fmt(totalMesApto)}</div>
-        </div>`;
-      }
     });
-    if(!filas) filas=`<div style="font-size:13px;color:var(--hint);padding:8px 0">Sin registros.</div>`;
+
+    // Tarjetas filtradas
+    let tarjetas='';
+    mesesFiltrados.forEach(h=>{
+      const sids=Object.keys(h.data||{});
+      let totalMes=0;
+      const chips=sids.map(sid=>{
+        const d=h.data[sid]; if(!d||!d.pagos)return'';
+        const sv=cfg.svcs.find(x=>x.id===sid);
+        const val=d.pagos[apto.id]||0;
+        if(!val)return'';
+        totalMes+=val;
+        const cs=sv?svcColorStyle(sv):'';
+        return `<span class="svc-chip-small" style="${cs}">${sv?sv.label:sid}<br>$${fmt(val)}</span>`;
+      }).filter(Boolean).join('');
+      if(!totalMes)return;
+      tarjetas+=`<div class="mes-apto-card">
+        <div class="mes-apto-header">
+          <span class="mes-apto-title">${h.mes} ${h.anio}</span>
+          <span class="mes-apto-total">$${fmt(totalMes)}</span>
+        </div>
+        <div class="svc-breakdown">${chips}</div>
+      </div>`;
+    });
+    if(!tarjetas) tarjetas=`<div style="font-size:13px;color:var(--hint);padding:8px 0">Sin registros para este mes.</div>`;
+
+    const aptoId=apto.id;
     c.innerHTML+=`<div class="apto-hist-card">
       <div class="apto-hist-name">${apto.label}${isPrincipal?'<span class="principal-badge">principal</span>':''}</div>
-      ${filas}
-      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border);margin-top:6px">
+      ${tarjetas}
+      ${_filtroGlobal==='todos'?`<div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border);margin-top:6px">
         <span style="font-size:12px;color:var(--muted)">Total acumulado</span>
-        <span style="font-size:15px;font-weight:600;font-family:'DM Mono',monospace;color:var(--accent)">$${fmt(totalApto)}</span>
-      </div>
+        <span style="font-size:15px;font-weight:600;font-family:'DM Mono',monospace;color:var(--accent)">$${fmt(totalAcumulado)}</span>
+      </div>`:''}
+      <button class="share-btn" onclick="abrirCompartir('${aptoId}')">📤 Compartir resumen</button>
     </div>`;
   });
 }
 
+function setFiltroGlobal(mesKey){
+  _filtroGlobal=mesKey;
+  renderPorApto();
+}
+
+let _acordeonAbierto=null;
+
 function verDetalle(idx){
-  const h=historial[idx];
-  document.getElementById('hist-list').style.display='none';
-  document.getElementById('hist-detail').style.display='block';
-  renderDetalleHTML(idx);
+  // Si el mismo está abierto, cerrarlo
+  if(_acordeonAbierto===idx){
+    _acordeonAbierto=null;
+  } else {
+    _acordeonAbierto=idx;
+  }
+  renderListadoMeses();
+  // Scroll suave al item abierto
+  if(_acordeonAbierto!==null){
+    setTimeout(()=>{
+      const el=document.getElementById('acord-'+_acordeonAbierto);
+      if(el) el.scrollIntoView({behavior:'smooth',block:'nearest'});
+    },50);
+  }
 }
 
-function renderDetalleHTML(idx){
-  const h=historial[idx];
-  const sids=Object.keys(h.data||{});
-  const totalGen=sids.reduce((a,sid)=>{const d=h.data[sid];return a+(d?d.total:0)},0);
-  let html=`<button class="back-btn" onclick="renderListadoMeses()">‹ Volver</button>
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
-    <div>
-      <div style="font-size:18px;font-weight:600">${h.mes} ${h.anio}</div>
-      <div style="font-size:13px;color:var(--muted);margin-top:2px">${cfg?cfg.aptos.length:''} apartamentos</div>
-    </div>
-    <button class="btn-sm" style="color:var(--danger);border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.08)" onclick="confirmarEliminarMes(${idx})">🗑️ Mes completo</button>
-  </div>
-  <div class="grand-card" style="margin-bottom:16px">
-    <div><div class="grand-label">Total todos los servicios</div></div>
-    <div class="grand-val">$${fmt(totalGen)}</div>
-  </div>`;
-
-  sids.forEach(sid=>{
-    const s=cfg&&cfg.svcs.find(x=>x.id===sid);
-    const d=h.data[sid]; if(!d)return;
-    const label=s?s.label:sid;
-    const colorStyle=s?svcColorStyle(s):'';
-    const isPartes=d.tipo==='partes';
-
-    html+=`<div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:6px">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span class="svc-badge" style="${colorStyle}">${label}</span>
-          ${isPartes
-            ?`<span style="font-size:12px;color:var(--muted)">➗ ${(d.aptosPartes||[]).length} partes</span>`
-            :`<span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace">$${fmt(d.tarifa)}/unid.</span>`}
-        </div>
-        <button class="btn-sm" style="color:var(--danger);border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.08);font-size:12px" onclick="confirmarEliminarSvc(${idx},'${sid}')">🗑️ Recibo</button>
-      </div>
-      <table class="det-table">
-        <thead><tr>
-          <th>Apartamento</th>
-          ${isPartes?'<th>Parte</th>':'<th>Unidades</th>'}
-          <th>A pagar</th>
-        </tr></thead><tbody>`;
-
-    if(isPartes){
-      const participantes=d.aptosPartes||[];
-      const n=participantes.length;
-      cfg.aptos.forEach(apto=>{
-        if(!participantes.includes(apto.id))return;
-        const isPrincipal=apto.id===cfg.aptos[0].id;
-        html+=`<tr>
-          <td>${apto.label}${isPrincipal?'<span class="principal-badge" style="font-size:9px">principal</span>':''}</td>
-          <td>1/${n}</td>
-          <td style="color:var(--success);font-weight:600">$${fmt(d.pagos[apto.id]||0)}</td>
-        </tr>`;
-      });
-    } else {
-      html+=`<tr>
-        <td>${cfg.aptos[0].label} <span class="principal-badge" style="font-size:9px">principal</span></td>
-        <td>${fmtDec(d.consumoPrincipal)}</td>
-        <td style="color:var(--success);font-weight:600">$${fmt(d.pagos[cfg.aptos[0].id]||0)}</td>
-      </tr>`;
-      cfg.aptos.slice(1).forEach(apto=>{
-        const lec=d.lecturas&&d.lecturas[apto.id]||{};
-        html+=`<tr>
-          <td>${apto.label}</td>
-          <td>${fmtDec(lec.consumo||0)}</td>
-          <td style="color:var(--success);font-weight:600">$${fmt(d.pagos[apto.id]||0)}</td>
-        </tr>`;
-      });
-    }
-    html+=`</tbody>
-      <tfoot><tr style="border-top:1px solid var(--border)">
-        <td style="font-weight:600;padding-top:8px">Total</td>
-        <td style="padding-top:8px;color:var(--muted)">${isPartes?'':fmtDec(d.cons)+' unid.'}</td>
-        <td style="padding-top:8px;font-weight:600;font-family:'DM Mono',monospace">$${fmt(d.total)}</td>
-      </tr></tfoot></table></div>`;
-  });
-
-  if(!sids.length) html+=`<div class="alert">No hay servicios guardados para este mes.</div>`;
-  document.getElementById('hist-detail').innerHTML=html;
-}
+// renderDetalleHTML migrado a buildDetalleInline (accordion)
 
 function confirmarEliminarMes(idx){
   const h=historial[idx];
   openModal(`¿Eliminar todo el mes ${h.mes} ${h.anio}? Se borrarán todos los recibos.`,
-    ()=>{historial.splice(idx,1);persist();renderHistorial();}
+    ()=>{_acordeonAbierto=null;historial.splice(idx,1);persist();renderListadoMeses();}
   );
 }
 function confirmarEliminarSvc(idx,sid){
@@ -855,14 +1022,68 @@ function confirmarEliminarSvc(idx,sid){
       delete h.data[sid];
       if(!Object.keys(h.data).length) historial.splice(idx,1);
       persist();
-      if(historial[idx]&&historial[idx].mes===h.mes) renderDetalleHTML(idx);
-      else renderHistorial();
+      renderListadoMeses();
     }
   );
 }
 
+/* ── COMPARTIR ── */
+function abrirCompartir(aptoId){
+  const apto=cfg&&cfg.aptos.find(a=>a.id===aptoId); if(!apto)return;
+  const mesesOrdenados=[...historial].sort((a,b)=>{
+    const ai=MESES.indexOf(a.mes)+parseInt(a.anio)*12;
+    const bi=MESES.indexOf(b.mes)+parseInt(b.anio)*12;
+    return ai-bi;
+  });
+  const mesesFiltrados=_filtroGlobal==='todos'
+    ?mesesOrdenados
+    :mesesOrdenados.filter(h=>h.mes+'_'+h.anio===_filtroGlobal);
+
+  let texto=`📋 Resumen de servicios — ${apto.label}\n`;
+  texto+='─────────────────────\n';
+  let totalGeneral=0;
+  mesesFiltrados.forEach(h=>{
+    const sids=Object.keys(h.data||{});
+    let totalMes=0;
+    const lineasSvc=[];
+    sids.forEach(sid=>{
+      const d=h.data[sid]; if(!d||!d.pagos)return;
+      const sv=cfg.svcs.find(x=>x.id===sid);
+      const val=d.pagos[aptoId]||0; if(!val)return;
+      totalMes+=val;
+      lineasSvc.push(`  ${sv?sv.label:sid}: $${fmt(val)}`);
+    });
+    if(!totalMes)return;
+    totalGeneral+=totalMes;
+    texto+=`\n📅 ${h.mes} ${h.anio}\n`;
+    texto+=lineasSvc.join('\n')+'\n';
+  });
+  texto+='─────────────────────\n';
+  texto+=`TOTAL ACUMULADO: $${fmt(totalGeneral)}`;
+
+  document.getElementById('share-text').value=texto;
+  document.getElementById('copy-btn').textContent='Copiar texto';
+  document.getElementById('modal-share').classList.add('open');
+}
+
+function copiarResumen(){
+  const ta=document.getElementById('share-text');
+  ta.select();
+  const cerrar=()=>document.getElementById('modal-share').classList.remove('open');
+  try{
+    navigator.clipboard.writeText(ta.value).then(cerrar).catch(()=>{
+      document.execCommand('copy'); cerrar();
+    });
+  } catch(e){
+    document.execCommand('copy'); cerrar();
+  }
+}
+
 /* ── INIT ── */
-load(); initMes();
+load();
+initMes();
+// Start on Historial tab
+renderHistorial();
 </script>
 </body>
 </html>
