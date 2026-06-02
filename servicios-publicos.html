@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Servicios">
+<meta name="theme-color" content="#0f172a">
+<title>Servicios Públicos</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#0f172a;--bg2:#1e293b;--bg3:#334155;
+  --border:#334155;--text:#f1f5f9;--muted:#94a3b8;--hint:#475569;
+  --accent:#6366f1;--accent-bg:rgba(99,102,241,0.15);
+  --success:#34d399;--danger:#f87171;--warn:#fbbf24;
+  --r:12px;--rs:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overscroll-behavior:none}
+.mono{font-family:'DM Mono',monospace}
+.app{display:flex;flex-direction:column;height:100dvh}
+.header{padding-top:calc(env(safe-area-inset-top,0px) + 16px);padding-left:20px;padding-right:20px;background:var(--bg);z-index:10}
+.header-inner{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.header-title{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.header-sub{font-size:18px;font-weight:600;color:var(--text);margin-top:2px}
+.icon-btn{width:38px;height:38px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:background .15s;flex-shrink:0}
+.icon-btn:active{background:var(--bg3)}
+.tabs{display:flex;gap:6px;padding:12px 20px;background:var(--bg)}
+.tab{flex:1;padding:8px;border-radius:var(--rs);background:transparent;border:1px solid var(--border);color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.tab.active{background:var(--accent-bg);border-color:var(--accent);color:var(--text)}
+/* sub-tabs historial */
+.subtabs{display:flex;gap:6px;margin-bottom:14px}
+.subtab{flex:1;padding:7px;border-radius:var(--rs);background:transparent;border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center}
+.subtab.active{background:var(--bg2);border-color:var(--border);color:var(--text);font-weight:600}
+.content{flex:1;overflow-y:auto;padding:12px 20px 100px;-webkit-overflow-scrolling:touch}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px}
+.card-title{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
+input,select{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .15s;-webkit-appearance:none}
+input:focus,select:focus{border-color:var(--accent)}
+input[type=number]{font-family:'DM Mono',monospace}
+input:disabled{color:var(--hint);border-color:var(--bg3);background:var(--bg3);cursor:not-allowed}
+input.err{border-color:var(--danger)!important}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+option{background:var(--bg2)}
+.field{margin-bottom:10px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{width:100%;padding:14px;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all .15s;margin-top:6px}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-ghost{background:var(--bg2);border:1px solid var(--border);color:var(--muted)}
+.btn-sm{padding:6px 14px;font-size:13px;border-radius:var(--rs);border:1px solid var(--border);background:var(--bg2);color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .15s;width:auto;margin-top:0}
+.btn-sm:active{transform:scale(.97)}
+/* tipo toggle */
+.tipo-toggle{display:flex;gap:6px;margin-bottom:8px}
+.tipo-btn{flex:1;padding:7px 6px;border-radius:var(--rs);border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center}
+.tipo-btn.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+/* checkboxes aptos */
+.apto-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:100px;border:1.5px solid var(--border);background:var(--bg3);color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;margin:4px}
+.apto-pill.sel{background:var(--accent-bg);border-color:var(--accent);color:var(--text);font-weight:600}
+.apto-pill.sel::before{content:'✓ ';font-size:12px;color:var(--accent)}
+.svc-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:100px;background:var(--sb-bg);color:var(--sb-color)}
+.tipo-pill{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;margin-left:6px}
+.tipo-pill.consumo{background:rgba(99,102,241,0.15);color:#a78bfa}
+.tipo-pill.partes{background:rgba(52,211,153,0.12);color:#34d399}
+.principal-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;background:var(--accent-bg);color:var(--accent);margin-left:6px}
+.svc-selector{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.svc-sel-btn{padding:8px 14px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.svc-sel-btn.active{border-color:var(--sb-color,var(--accent));background:var(--sb-bg,var(--accent-bg));color:var(--sb-color,var(--accent))}
+.pair-label{font-size:9px;color:var(--hint);text-align:center;font-family:'DM Mono',monospace;margin-bottom:2px}
+input.small{padding:8px 6px;font-size:13px;text-align:center}
+input.small:disabled{font-size:12px}
+.apto-result-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px}
+.apto-result-name{font-size:14px;font-weight:600;margin-bottom:6px}
+.detail-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:3px}
+.apto-total-row{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);margin-top:6px}
+.apto-total-label{font-size:12px;color:var(--muted)}
+.apto-total-val{font-size:16px;font-weight:600;font-family:'DM Mono',monospace;color:var(--success)}
+.grand-card{background:var(--accent-bg);border:1px solid var(--accent);border-radius:var(--r);padding:16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.grand-label{font-size:13px;color:var(--muted)}
+.grand-val{font-size:22px;font-weight:600;font-family:'DM Mono',monospace;color:var(--text)}
+.hist-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:border-color .15s}
+.hist-item:active{border-color:var(--accent)}
+.hist-mes{font-size:15px;font-weight:600}
+.hist-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.hist-total{font-size:15px;font-weight:600;font-family:'DM Mono',monospace;color:var(--success)}
+.back-btn{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;padding:8px 0;margin-bottom:12px;background:none;border:none;font-family:'DM Sans',sans-serif}
+.alert{padding:12px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:10px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:var(--warn)}
+.err-box{padding:12px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:10px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);color:var(--danger);display:none}
+.info-box{padding:10px 12px;border-radius:var(--rs);font-size:12px;margin-bottom:10px;background:var(--accent-bg);border:1px solid rgba(99,102,241,0.3);color:var(--accent)}
+hr{border:none;border-top:1px solid var(--border);margin:14px 0}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px}
+.overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:100;flex-direction:column;overflow-y:auto;padding:calc(env(safe-area-inset-top,0px)+20px) 20px 40px}
+.overlay.open{display:flex;flex-direction:column}
+.overlay-title{font-size:20px;font-weight:700;margin-bottom:20px}
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:24px;max-width:340px;width:100%;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:8px}
+.modal-body{font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.5}
+.modal-actions{display:flex;gap:8px}
+.modal-actions button{flex:1;padding:12px;border-radius:var(--rs);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none}
+.edit-list-item{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.edit-list-item input{flex:1}
+.del-btn{width:32px;height:32px;border-radius:50%;border:1px solid rgba(248,113,113,0.3);background:rgba(248,113,113,0.1);color:var(--danger);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.del-btn:active{transform:scale(.95)}
+.tag-principal{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;background:var(--accent-bg);color:var(--accent);white-space:nowrap;flex-shrink:0}
+.det-table{width:100%;border-collapse:collapse;font-size:13px}
+.det-table th{font-size:11px;font-weight:600;color:var(--muted);text-align:left;padding:4px 0;border-bottom:1px solid var(--border)}
+.det-table td{padding:7px 0;border-bottom:1px solid var(--bg3);vertical-align:top}
+.det-table td:not(:first-child){text-align:right;font-family:'DM Mono',monospace}
+.det-table tr:last-child td{border-bottom:none}
+/* vista por apto */
+.apto-hist-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px}
+.apto-hist-name{font-size:15px;font-weight:600;margin-bottom:10px}
+.apto-hist-mes-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bg3);font-size:13px}
+.apto-hist-mes-row:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-inner">
+      <div>
+        <div class="header-title">Servicios Públicos</div>
+        <div class="header-sub" id="hdr-sub">Sin configurar</div>
+      </div>
+      <div class="icon-btn" onclick="openSetup()">⚙️</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('mes',this)">Mes actual</button>
+    <button class="tab" onclick="switchTab('hist',this)">Historial</button>
+  </div>
+  <div class="content">
+    <div id="tab-mes">
+      <div id="no-cfg" class="alert">⚠️ Configura los apartamentos y servicios usando el botón ⚙️</div>
+      <div id="svc-selector-wrap" style="display:none">
+        <div class="card-title" style="margin-bottom:8px">Selecciona el recibo</div>
+        <div class="svc-selector" id="svc-selector"></div>
+        <div id="svc-panel"></div>
+      </div>
+    </div>
+    <div id="tab-hist" style="display:none">
+      <div id="hist-empty" class="empty" style="display:none">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">Sin registros aún</div>
+        <div>Ingresa el primer mes para comenzar.</div>
+      </div>
+      <!-- sub-pestañas historial -->
+      <div id="hist-subtabs" style="display:none">
+        <div class="subtabs">
+          <button class="subtab active" id="stab-recibos" onclick="switchSubtab('recibos',this)">Por recibo</button>
+          <button class="subtab" id="stab-aptos" onclick="switchSubtab('aptos',this)">Por apartamento</button>
+        </div>
+      </div>
+      <div id="hist-list"></div>
+      <div id="hist-detail" style="display:none"></div>
+      <div id="hist-by-apto" style="display:none"></div>
+      <div style="height:env(safe-area-inset-bottom,20px)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP OVERLAY -->
+<div class="overlay" id="setup-overlay">
+  <div class="overlay-title">⚙️ Configuración</div>
+  <div class="card">
+    <div class="card-title">Servicios</div>
+    <div id="cfg-svcs-list"></div>
+    <button class="btn-sm" onclick="addSvc()" style="margin-top:10px">+ Agregar servicio</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Apartamentos</div>
+    <div style="font-size:11px;color:var(--hint);margin-bottom:10px">El <strong style="color:var(--accent)">primero</strong> es el apto principal (sin contador propio).</div>
+    <div id="cfg-aptos-list"></div>
+    <button class="btn-sm" onclick="addApto()" style="margin-top:10px">+ Agregar apartamento</button>
+  </div>
+  <button class="btn btn-primary" onclick="saveSetup()">Guardar configuración</button>
+  <button class="btn btn-ghost" onclick="closeSetup()" style="margin-top:6px">Cancelar</button>
+  <div style="height:40px"></div>
+</div>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div class="modal-backdrop" id="modal-del">
+  <div class="modal">
+    <div class="modal-title">⚠️ Confirmar</div>
+    <div class="modal-body" id="modal-del-body"></div>
+    <div class="modal-actions">
+      <button style="background:var(--bg3);color:var(--muted)" onclick="closeModal()">Cancelar</button>
+      <button style="background:rgba(248,113,113,0.15);color:var(--danger);border:1px solid rgba(248,113,113,0.3)" id="modal-del-confirm">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const SVC_COLORS=[
+  {bg:'rgba(251,191,36,0.12)',color:'#fbbf24'},
+  {bg:'rgba(56,189,248,0.12)',color:'#38bdf8'},
+  {bg:'rgba(251,146,60,0.12)',color:'#fb923c'},
+  {bg:'rgba(52,211,153,0.12)',color:'#34d399'},
+  {bg:'rgba(167,139,250,0.12)',color:'#a78bfa'},
+  {bg:'rgba(248,113,113,0.12)',color:'#f87171'},
+];
+
+/*
+cfg = {
+  svcs: [{id, label, icon, colorIdx, tipo:'consumo'|'partes', aptosPartes:[aptoId,...]}]
+  aptos: [{id, label}]   // aptos[0] = principal
+}
+historial = [{mes, anio, data:{
+  svcId: {
+    tipo:'consumo', total, cons, tarifa, lecturas:{aptoId:{ant,act,consumo}}, consumoPrincipal, pagos:{aptoId:val}
+  } | {
+    tipo:'partes', total, aptosPartes:[aptoId,...], pagos:{aptoId:val}
+  }
+}}]
+*/
+let cfg=null, historial=[], activeSvc=null, cfgSvcsTemp=[], cfgAptosTemp=[];
+let histSubtab='recibos';
+
+function load(){
+  try{cfg=JSON.parse(localStorage.getItem('spu4_cfg')||'null')}catch(e){cfg=null}
+  try{historial=JSON.parse(localStorage.getItem('spu4_hist')||'[]')}catch(e){historial=[]}
+}
+function persist(){
+  localStorage.setItem('spu4_cfg',JSON.stringify(cfg));
+  localStorage.setItem('spu4_hist',JSON.stringify(historial));
+}
+function uid(){return Math.random().toString(36).slice(2,8)}
+function svcColor(s){return SVC_COLORS[(s.colorIdx||0)%SVC_COLORS.length]}
+function svcColorStyle(s){const c=svcColor(s);return `--sb-bg:${c.bg};--sb-color:${c.color}`}
+function fmt(n){return Math.round(n).toLocaleString('es-CO')}
+function fmtDec(n){return Number(n).toFixed(2)}
+
+/* ── MODAL ── */
+function openModal(body,onConfirm){
+  document.getElementById('modal-del-body').textContent=body;
+  document.getElementById('modal-del-confirm').onclick=()=>{closeModal();onConfirm();};
+  document.getElementById('modal-del').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-del').classList.remove('open')}
+
+/* ── TABS ── */
+function switchTab(id,btn){
+  ['mes','hist'].forEach(t=>document.getElementById('tab-'+t).style.display='none');
+  document.getElementById('tab-'+id).style.display='block';
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(id==='hist') renderHistorial();
+}
+
+function switchSubtab(id,btn){
+  histSubtab=id;
+  document.querySelectorAll('.subtab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('hist-list').style.display='none';
+  document.getElementById('hist-detail').style.display='none';
+  document.getElementById('hist-by-apto').style.display='none';
+  if(id==='recibos'){renderListadoMeses();}
+  else{renderPorApto();}
+}
+
+/* ── SETUP ── */
+function openSetup(){
+  cfgSvcsTemp=cfg&&cfg.svcs?cfg.svcs.map(s=>({...s,aptosPartes:s.aptosPartes?s.aptosPartes.map(x=>String(x)):[]})):[];
+  cfgAptosTemp=cfg&&cfg.aptos?cfg.aptos.map(a=>({...a})):[];
+  if(!cfgSvcsTemp.length) cfgSvcsTemp=[
+    {id:uid(),label:'Luz',colorIdx:0,tipo:'consumo',aptosPartes:[]},
+    {id:uid(),label:'Agua',colorIdx:1,tipo:'consumo',aptosPartes:[]},
+    {id:uid(),label:'Gas',colorIdx:2,tipo:'consumo',aptosPartes:[]}
+  ];
+  if(!cfgAptosTemp.length) cfgAptosTemp=[{id:uid(),label:'Apto 1'},{id:uid(),label:'Apto 2'},{id:uid(),label:'Apto 3'}];
+  renderCfgSvcs(); renderCfgAptos();
+  document.getElementById('setup-overlay').classList.add('open');
+}
+function closeSetup(){document.getElementById('setup-overlay').classList.remove('open')}
+
+function svcCardId(sid){return 'svc-card-'+sid}
+
+function renderCfgSvcs(){
+  const c=document.getElementById('cfg-svcs-list'); c.innerHTML='';
+  cfgSvcsTemp.forEach((s,i)=>{
+    c.innerHTML+=buildSvcCard(s,i);
+  });
+  // Set checkbox state programmatically AFTER innerHTML is parsed
+  applyCheckboxState();
+}
+
+function buildSvcCard(s,i){
+  const col=svcColor(s);
+  const isPartes=s.tipo==='partes';
+  if(!s.aptosPartes) s.aptosPartes=[];
+  let aptosHtml='';
+  if(isPartes){
+    const rows=cfgAptosTemp.map(a=>{
+      const sel=(s.aptosPartes||[]).map(x=>String(x)).includes(String(a.id));
+      return `<span class="apto-pill${sel?' sel':''}" id="pill-${s.id}-${a.id}" onclick="toggleAptoParte('${s.id}','${a.id}')">${a.label}</span>`;
+    }).join('');
+    aptosHtml=`<div style="margin-top:8px;padding:8px 10px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--border)">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Toca para seleccionar / deseleccionar:</div>
+      <div style="display:flex;flex-wrap:wrap;margin:-4px">${rows}</div>
+    </div>`;
+  }
+  return `<div id="${svcCardId(s.id)}" style="background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:10px;margin-bottom:10px">
+    <div class="edit-list-item" style="margin-bottom:8px">
+      <span style="width:28px;height:28px;border-radius:50%;background:${col.color};display:inline-block;flex-shrink:0;cursor:pointer;border:2px solid ${col.color}" onclick="cycleSvcColor('${s.id}')" title="Cambiar color"></span>
+      <input type="text" value="${s.label}" oninput="cfgSvcsTemp[${i}].label=this.value" placeholder="Nombre servicio">
+      ${cfgSvcsTemp.length>1?`<button class="del-btn" onclick="delSvc('${s.id}')">×</button>`:''}
+    </div>
+    <div class="tipo-toggle">
+      <button class="tipo-btn ${!isPartes?'on':''}" onclick="setSvcTipo('${s.id}','consumo')">Por consumo</button>
+      <button class="tipo-btn ${isPartes?'on':''}" onclick="setSvcTipo('${s.id}','partes')">Por partes iguales</button>
+    </div>
+    ${aptosHtml}
+  </div>`;
+}
+
+function applyCheckboxState(){
+  // Pills are rendered with correct state directly — nothing to do here
+}
+
+function toggleAptoParte(sid,aid){
+  const s=cfgSvcsTemp.find(x=>x.id===sid); if(!s)return;
+  if(!s.aptosPartes) s.aptosPartes=[];
+  const aidStr=String(aid);
+  const partes=s.aptosPartes.map(x=>String(x));
+  if(partes.includes(aidStr)){
+    s.aptosPartes=s.aptosPartes.filter(x=>String(x)!==aidStr);
+  } else {
+    s.aptosPartes.push(aid);
+  }
+  // Update pill visual directly — no re-render needed
+  const pill=document.getElementById('pill-'+sid+'-'+aid);
+  if(pill){
+    const nowSel=s.aptosPartes.map(x=>String(x)).includes(aidStr);
+    pill.className='apto-pill'+(nowSel?' sel':'');
+    pill.textContent=nowSel?'✓ '+cfgAptosTemp.find(a=>String(a.id)===aidStr)?.label||aid:cfgAptosTemp.find(a=>String(a.id)===aidStr)?.label||aid;
+  }
+}
+
+function setSvcTipo(sid,tipo){
+  const s=cfgSvcsTemp.find(x=>x.id===sid); if(!s)return;
+  s.tipo=tipo;
+  if(tipo==='partes'&&(!s.aptosPartes||!s.aptosPartes.length)) s.aptosPartes=cfgAptosTemp.map(a=>a.id);
+  // Only re-render this card, not the whole list — preserves other cards' checkbox state
+  const card=document.getElementById(svcCardId(sid));
+  if(card){
+    const i=cfgSvcsTemp.indexOf(s);
+    card.outerHTML=buildSvcCard(s,i);
+    applyCheckboxState();
+  }
+}
+
+function cycleSvcColor(sid){
+  const s=cfgSvcsTemp.find(x=>x.id===sid);if(!s)return;
+  s.colorIdx=((s.colorIdx||0)+1)%SVC_COLORS.length;
+  const card=document.getElementById(svcCardId(sid));
+  if(card){const i=cfgSvcsTemp.indexOf(s);card.outerHTML=buildSvcCard(s,i);applyCheckboxState();}
+}
+function addSvc(){
+  cfgSvcsTemp.push({id:uid(),label:'Servicio '+(cfgSvcsTemp.length+1),colorIdx:cfgSvcsTemp.length%SVC_COLORS.length,tipo:'consumo',aptosPartes:[]});
+  // Full re-render only when adding (no existing checkboxes to lose)
+  renderCfgSvcs();
+}
+function delSvc(sid){
+  cfgSvcsTemp=cfgSvcsTemp.filter(s=>s.id!==sid);
+  renderCfgSvcs();
+}
+
+function renderCfgAptos(){
+  const c=document.getElementById('cfg-aptos-list'); c.innerHTML='';
+  cfgAptosTemp.forEach((a,i)=>{
+    c.innerHTML+=`<div class="edit-list-item">
+      <input type="text" value="${a.label}" oninput="cfgAptosTemp[${i}].label=this.value" placeholder="Nombre apto">
+      ${i===0?'<span class="tag-principal">principal</span>':''}
+      ${cfgAptosTemp.length>2&&i>0?`<button class="del-btn" onclick="delApto('${a.id}')">×</button>`:''}
+    </div>`;
+  });
+}
+function addApto(){cfgAptosTemp.push({id:uid(),label:'Apto '+(cfgAptosTemp.length+1)});renderCfgAptos()}
+function delApto(aid){if(cfgAptosTemp.length<=2){alert('Mínimo 2 apartamentos.');return}cfgAptosTemp=cfgAptosTemp.filter(a=>a.id!==aid);renderCfgAptos()}
+
+function saveSetup(){
+  if(!cfgSvcsTemp.length){alert('Agrega al menos un servicio.');return}
+  if(cfgAptosTemp.length<2){alert('Mínimo 2 apartamentos.');return}
+  // Validar que servicios por partes tengan al menos un apto seleccionado
+  for(const s of cfgSvcsTemp){
+    if(s.tipo==='partes'&&(!s.aptosPartes||!s.aptosPartes.length)){
+      alert(`El servicio "${s.label}" es "Por partes" pero no tiene aptos seleccionados.`);return;
+    }
+  }
+  cfg={svcs:cfgSvcsTemp,aptos:cfgAptosTemp}; persist(); closeSetup(); initMes();
+}
+
+/* ── INIT MES ── */
+function initMes(){
+  if(!cfg){
+    document.getElementById('no-cfg').style.display='block';
+    document.getElementById('svc-selector-wrap').style.display='none';
+    document.getElementById('hdr-sub').textContent='Sin configurar'; return;
+  }
+  document.getElementById('no-cfg').style.display='none';
+  document.getElementById('hdr-sub').textContent=`${cfg.aptos.length} aptos · ${cfg.svcs.length} servicios`;
+  document.getElementById('svc-selector-wrap').style.display='block';
+  const sel=document.getElementById('svc-selector'); sel.innerHTML='';
+  cfg.svcs.forEach(s=>{
+    sel.innerHTML+=`<button class="svc-sel-btn" id="selbtn-${s.id}" style="${svcColorStyle(s)}" onclick="selectSvc('${s.id}')">${s.label}</button>`;
+  });
+  activeSvc=null; selectSvc(cfg.svcs[0].id);
+}
+
+function selectSvc(sid){
+  activeSvc=sid;
+  cfg.svcs.forEach(s=>{
+    const btn=document.getElementById('selbtn-'+s.id); if(!btn)return;
+    btn.className='svc-sel-btn'+(s.id===sid?' active':'');
+  });
+  renderSvcPanel(sid);
+}
+
+/* ── PANEL SERVICIO ── */
+function renderSvcPanel(sid){
+  const panel=document.getElementById('svc-panel');
+  const s=cfg.svcs.find(x=>x.id===sid); if(!s)return;
+  const hoy=new Date();
+  const mesActual=MESES[hoy.getMonth()], anioActual=String(hoy.getFullYear());
+  const entry=getEntry(mesActual,anioActual);
+  const saved=entry&&entry.data&&entry.data[sid];
+  const mesesOpts=MESES.map(m=>`<option${m===mesActual?' selected':''}>${m}</option>`).join('');
+  const tipoPill=`<span class="tipo-pill ${s.tipo}">${s.tipo==='consumo'?'Consumo':'Partes iguales'}</span>`;
+
+  panel.innerHTML=`
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+      <span class="svc-badge" style="${svcColorStyle(s)}">${s.label}</span>
+      ${tipoPill}
+    </div>
+    <div class="row2" style="margin-bottom:12px">
+      <div class="field"><label>Mes</label><select id="p-mes" onchange="onMesCambio()">${mesesOpts}</select></div>
+      <div class="field"><label>Año</label><input type="number" id="p-anio" value="${anioActual}" min="2020" max="2035" onchange="onMesCambio()"></div>
+    </div>
+    <hr style="margin-bottom:14px">
+    <div class="card-title">Datos del recibo</div>
+    <div class="field"><label>Valor total ($)</label><input type="number" id="p-total" inputmode="decimal" placeholder="0" value="${saved?saved.total:''}"></div>
+    ${s.tipo==='consumo'?`
+    <div class="field"><label>Consumo total (unid.)</label><input type="number" id="p-cons" inputmode="decimal" placeholder="0" value="${saved?saved.cons:''}"></div>
+    <hr style="margin-bottom:14px">
+    <div class="card-title">Lecturas contadores internos</div>
+    <div class="info-box" style="margin-bottom:12px">
+      🔒 Lectura <strong>anterior</strong> viene del mes previo guardado.<br>
+      <strong style="color:var(--accent)">${cfg.aptos[0].label}</strong> es el apto principal — sin contador propio.
+    </div>
+    <div id="p-contadores"></div>
+    `:`
+    <hr style="margin-bottom:14px">
+    <div class="card-title">Aptos que comparten este servicio</div>
+    <div id="p-partes-aptos"></div>
+    `}
+  </div>
+  <div class="err-box" id="err-box">⚠️ <span id="err-msg"></span></div>
+  <button class="btn btn-primary" onclick="guardarSvc()">💾 Guardar ${s.label}</button>
+  <div id="p-resultado" style="display:none"></div>
+  <div style="height:env(safe-area-inset-bottom,20px)"></div>`;
+
+  if(s.tipo==='consumo'){
+    renderContadoresPanel(sid,mesActual,anioActual,saved);
+  } else {
+    renderPartesPanel(s,saved);
+  }
+  if(saved&&saved.pagos) renderResultadoSvc(sid,saved);
+}
+
+function renderPartesPanel(s,saved){
+  const c=document.getElementById('p-partes-aptos'); if(!c)return;
+  // Los aptos participantes vienen de la config del servicio
+  const participantes=s.aptosPartes||[];
+  const aptosFiltrados=cfg.aptos.filter(a=>participantes.includes(a.id));
+  if(!aptosFiltrados.length){c.innerHTML=`<div class="alert">No hay aptos seleccionados para este servicio. Edita la configuración.</div>`;return;}
+  c.innerHTML=`<div style="font-size:12px;color:var(--muted);margin-bottom:8px">El valor total se divide en partes iguales entre los aptos seleccionados en la configuración.</div>`;
+  aptosFiltrados.forEach(a=>{
+    const isPrincipal=a.id===cfg.aptos[0].id;
+    c.innerHTML+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bg3)">
+      <span style="font-size:13px">${a.label}</span>
+      ${isPrincipal?'<span class="principal-badge">principal</span>':''}
+    </div>`;
+  });
+  c.innerHTML+=`<div style="font-size:12px;color:var(--accent);margin-top:8px">Cada apto pagará: <strong>total ÷ ${aptosFiltrados.length}</strong></div>`;
+}
+
+function onMesCambio(){
+  const sid=activeSvc; if(!sid)return;
+  const s=cfg.svcs.find(x=>x.id===sid); if(!s)return;
+  const mes=document.getElementById('p-mes').value;
+  const anio=document.getElementById('p-anio').value;
+  const entry=getEntry(mes,anio);
+  const saved=entry&&entry.data&&entry.data[sid];
+  if(s.tipo==='consumo') renderContadoresPanel(sid,mes,anio,saved);
+  const resEl=document.getElementById('p-resultado');
+  if(resEl){if(saved&&saved.pagos)renderResultadoSvc(sid,saved);else resEl.style.display='none';}
+  if(document.getElementById('p-total')) document.getElementById('p-total').value=saved?saved.total:'';
+  if(document.getElementById('p-cons')) document.getElementById('p-cons')&&(document.getElementById('p-cons').value=saved?saved.cons:'');
+}
+
+function getPrevLectura(sid,aptoId,mes,anio){
+  const mi=MESES.indexOf(mes), an=parseInt(anio);
+  const pm=mi===0?MESES[11]:MESES[mi-1], pa=mi===0?an-1:an;
+  const pe=getEntry(pm,String(pa));
+  if(pe&&pe.data&&pe.data[sid]&&pe.data[sid].lecturas){
+    const l=pe.data[sid].lecturas[aptoId];
+    if(l) return {val:l.act,found:true};
+  }
+  return {val:'',found:false};
+}
+
+function renderContadoresPanel(sid,mes,anio,saved){
+  const c=document.getElementById('p-contadores'); if(!c)return;
+  c.innerHTML='';
+  cfg.aptos.slice(1).forEach((apto,idx)=>{
+    let antVal='', antLocked=false, hint='';
+    if(saved&&saved.lecturas&&saved.lecturas[apto.id]){
+      antVal=saved.lecturas[apto.id].ant; antLocked=true;
+    } else {
+      const prev=getPrevLectura(sid,apto.id,mes,anio);
+      if(prev.found){antVal=prev.val;antLocked=true;hint='🔒 Del mes anterior';}
+      else hint='⚠️ Sin datos previos — ingresa el valor inicial';
+    }
+    const actVal=saved&&saved.lecturas&&saved.lecturas[apto.id]?saved.lecturas[apto.id].act:'';
+    c.innerHTML+=`
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--muted);display:inline-block"></span>${apto.label}
+      </div>
+      ${hint?`<div style="font-size:10px;color:${antLocked?'var(--success)':'var(--warn)'};margin-bottom:6px">${hint}</div>`:''}
+      <div class="row2">
+        <div><div class="pair-label">ANTERIOR${antLocked?' 🔒':''}</div>
+          <input class="small" type="number" id="lec-${apto.id}-ant" inputmode="decimal" value="${antVal}" placeholder="0" ${antLocked?'disabled':''}></div>
+        <div><div class="pair-label">ACTUAL</div>
+          <input class="small" type="number" id="lec-${apto.id}-act" inputmode="decimal" value="${actVal}" placeholder="0"></div>
+      </div>
+    </div>`;
+    if(idx<cfg.aptos.length-2) c.innerHTML+=`<hr>`;
+  });
+}
+
+/* ── VALIDAR Y GUARDAR ── */
+function mostrarError(msg){
+  const b=document.getElementById('err-box'),m=document.getElementById('err-msg');
+  if(!b||!m)return; m.textContent=msg; b.style.display='block';
+  b.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function limpiarError(){
+  const b=document.getElementById('err-box'); if(b)b.style.display='none';
+  document.querySelectorAll('input.err').forEach(el=>el.classList.remove('err'));
+}
+
+function guardarSvc(){
+  limpiarError();
+  const sid=activeSvc;
+  const s=cfg.svcs.find(x=>x.id===sid); if(!s)return;
+  const mes=document.getElementById('p-mes').value;
+  const anio=document.getElementById('p-anio').value;
+  const totalEl=document.getElementById('p-total');
+  const total=parseFloat(totalEl?totalEl.value:'')||0;
+  let errores=[], erEls=[];
+
+  if(!total||total<=0){errores.push('el valor total del recibo');erEls.push(totalEl)}
+
+  let svcData;
+
+  if(s.tipo==='partes'){
+    if(errores.length){erEls.forEach(el=>{if(el)el.classList.add('err')});mostrarError('Completa: '+errores.join(', ')+'.');return;}
+    const participantes=(s.aptosPartes||[]).filter(aid=>cfg.aptos.find(a=>a.id===aid));
+    if(!participantes.length){mostrarError('No hay aptos seleccionados para este servicio.');return;}
+    const parteVal=Math.round(total/participantes.length);
+    const pagos={};
+    participantes.forEach(aid=>{pagos[aid]=parteVal;});
+    // Ajuste de centavos en el primero por redondeo
+    const suma=Object.values(pagos).reduce((a,v)=>a+v,0);
+    if(suma!==Math.round(total)&&participantes.length){pagos[participantes[0]]+=Math.round(total)-suma;}
+    svcData={tipo:'partes',total,aptosPartes:participantes,pagos};
+  } else {
+    const consEl=document.getElementById('p-cons');
+    const cons=parseFloat(consEl?consEl.value:'')||0;
+    if(!cons||cons<=0){errores.push('el consumo total del recibo');erEls.push(consEl)}
+    cfg.aptos.slice(1).forEach(apto=>{
+      const actEl=document.getElementById(`lec-${apto.id}-act`);
+      const antEl=document.getElementById(`lec-${apto.id}-ant`);
+      if(!actEl||isNaN(parseFloat(actEl.value))||actEl.value===''){errores.push(`lectura actual de ${apto.label}`);if(actEl)erEls.push(actEl);}
+      if(antEl&&!antEl.disabled&&(isNaN(parseFloat(antEl.value))||antEl.value==='')){errores.push(`lectura anterior de ${apto.label}`);if(antEl)erEls.push(antEl);}
+    });
+    if(errores.length){erEls.forEach(el=>{if(el)el.classList.add('err')});mostrarError('Completa: '+errores.join(', ')+'.');return;}
+    const tarifa=cons>0?total/cons:0;
+    const lecturas={};
+    cfg.aptos.slice(1).forEach(apto=>{
+      const ant=parseFloat(document.getElementById(`lec-${apto.id}-ant`).value)||0;
+      const act=parseFloat(document.getElementById(`lec-${apto.id}-act`).value)||0;
+      lecturas[apto.id]={ant,act,consumo:Math.max(0,act-ant)};
+    });
+    const consumoContadores=Object.values(lecturas).reduce((a,l)=>a+l.consumo,0);
+    const consumoPrincipal=Math.max(0,cons-consumoContadores);
+    const pagos={};
+    pagos[cfg.aptos[0].id]=Math.round(consumoPrincipal*tarifa);
+    cfg.aptos.slice(1).forEach(apto=>{pagos[apto.id]=Math.round(lecturas[apto.id].consumo*tarifa);});
+    svcData={tipo:'consumo',total,cons,tarifa,lecturas,consumoPrincipal,pagos};
+  }
+
+  let entry=getEntry(mes,anio);
+  if(!entry){entry={mes,anio,data:{}};historial.push(entry);}
+  entry.data[sid]=svcData; persist();
+  renderResultadoSvc(sid,svcData);
+}
+
+/* ── RESULTADO ── */
+function renderResultadoSvc(sid,svcData){
+  const s=cfg.svcs.find(x=>x.id===sid);
+  const res=document.getElementById('p-resultado'); if(!res||!s)return;
+  res.style.display='block';
+  let rows='';
+
+  if(svcData.tipo==='partes'){
+    const participantes=svcData.aptosPartes||[];
+    const n=participantes.length;
+    cfg.aptos.forEach(apto=>{
+      if(!participantes.includes(apto.id))return;
+      const isPrincipal=apto.id===cfg.aptos[0].id;
+      rows+=`<div class="apto-result-card">
+        <div class="apto-result-name">${apto.label}${isPrincipal?'<span class="principal-badge">principal</span>':''}</div>
+        <div class="detail-row"><span>1 de ${n} partes iguales</span></div>
+        <div class="apto-total-row"><span class="apto-total-label">A pagar</span><span class="apto-total-val">$${fmt(svcData.pagos[apto.id]||0)}</span></div>
+      </div>`;
+    });
+    res.innerHTML=`<div class="grand-card" style="margin-top:6px">
+      <div><div class="grand-label">${s.icon} ${s.label} — total recibo</div><div class="grand-label" style="font-size:11px">➗ Dividido en ${n} partes iguales</div></div>
+      <div class="grand-val">$${fmt(svcData.total)}</div>
+    </div>${rows}`;
+  } else {
+    rows+=`<div class="apto-result-card">
+      <div class="apto-result-name">${cfg.aptos[0].label} <span class="principal-badge">principal</span></div>
+      <div class="detail-row"><span>Consumo (por diferencia)</span><span>${fmtDec(svcData.consumoPrincipal)} unid.</span></div>
+      <div class="apto-total-row"><span class="apto-total-label">A pagar</span><span class="apto-total-val">$${fmt(svcData.pagos[cfg.aptos[0].id]||0)}</span></div>
+    </div>`;
+    cfg.aptos.slice(1).forEach(apto=>{
+      const lec=svcData.lecturas[apto.id]||{};
+      rows+=`<div class="apto-result-card">
+        <div class="apto-result-name">${apto.label}</div>
+        <div class="detail-row"><span>Ant: ${lec.ant||0} → Act: ${lec.act||0}</span><span>${fmtDec(lec.consumo||0)} unid.</span></div>
+        <div class="apto-total-row"><span class="apto-total-label">A pagar</span><span class="apto-total-val">$${fmt(svcData.pagos[apto.id]||0)}</span></div>
+      </div>`;
+    });
+    res.innerHTML=`<div class="grand-card" style="margin-top:6px">
+      <div><div class="grand-label">${s.icon} ${s.label} — total recibo</div><div class="grand-label" style="font-size:11px">Tarifa $${fmt(svcData.tarifa)}/unid. · ${fmtDec(svcData.cons)} unid.</div></div>
+      <div class="grand-val">$${fmt(svcData.total)}</div>
+    </div>${rows}`;
+  }
+}
+
+/* ── HISTORIAL ── */
+function getEntry(mes,anio){return historial.find(h=>h.mes===mes&&String(h.anio)===String(anio))||null}
+
+function renderHistorial(){
+  const empty=document.getElementById('hist-empty');
+  const subtabs=document.getElementById('hist-subtabs');
+  if(!historial.length){
+    empty.style.display='block';
+    subtabs.style.display='none';
+    document.getElementById('hist-list').style.display='none';
+    document.getElementById('hist-by-apto').style.display='none';
+    return;
+  }
+  empty.style.display='none';
+  subtabs.style.display='block';
+  if(histSubtab==='recibos') renderListadoMeses();
+  else renderPorApto();
+}
+
+function renderListadoMeses(){
+  document.getElementById('hist-detail').style.display='none';
+  document.getElementById('hist-by-apto').style.display='none';
+  const list=document.getElementById('hist-list');
+  list.style.display='block'; list.innerHTML='';
+  [...historial].reverse().forEach((h,ri)=>{
+    const i=historial.length-1-ri;
+    const sids=Object.keys(h.data||{});
+    const totalGen=sids.reduce((a,sid)=>{const d=h.data[sid];return a+(d?d.total:0)},0);
+    const svcsLabels=sids.map(sid=>{const s=cfg&&cfg.svcs.find(x=>x.id===sid);return s?s.label:sid}).join(' · ');
+    list.innerHTML+=`<div class="hist-item" onclick="verDetalle(${i})">
+      <div><div class="hist-mes">${h.mes} ${h.anio}</div><div class="hist-sub">${svcsLabels||'Sin datos'}</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><div class="hist-total">$${fmt(totalGen)}</div><div style="font-size:18px;color:var(--hint)">›</div></div>
+    </div>`;
+  });
+}
+
+function renderPorApto(){
+  document.getElementById('hist-list').style.display='none';
+  document.getElementById('hist-detail').style.display='none';
+  const c=document.getElementById('hist-by-apto');
+  c.style.display='block'; c.innerHTML='';
+  if(!cfg)return;
+
+  // Todos los meses ordenados cronológicamente
+  const mesesOrdenados=[...historial].sort((a,b)=>{
+    const ai=MESES.indexOf(a.mes)+parseInt(a.anio)*12;
+    const bi=MESES.indexOf(b.mes)+parseInt(b.anio)*12;
+    return ai-bi;
+  });
+
+  cfg.aptos.forEach((apto,ai)=>{
+    const isPrincipal=ai===0;
+    let filas='';
+    let totalApto=0;
+    mesesOrdenados.forEach(h=>{
+      const sids=Object.keys(h.data||{});
+      let totalMesApto=0;
+      sids.forEach(sid=>{
+        const d=h.data[sid]; if(!d||!d.pagos)return;
+        totalMesApto+=d.pagos[apto.id]||0;
+      });
+      if(totalMesApto>0||sids.length>0){
+        totalApto+=totalMesApto;
+        // Detalle por servicio en ese mes
+        const detalleServs=sids.map(sid=>{
+          const d=h.data[sid]; if(!d||!d.pagos)return'';
+          const sv=cfg.svcs.find(x=>x.id===sid);
+          const val=d.pagos[apto.id]||0;
+          if(!val)return'';
+          return `<span style="font-size:11px;color:var(--muted)">${sv?sv.label:sid}: $${fmt(val)}</span>`;
+        }).filter(Boolean).join('  ');
+        filas+=`<div class="apto-hist-mes-row">
+          <div>
+            <div>${h.mes} ${h.anio}</div>
+            ${detalleServs?`<div style="margin-top:2px">${detalleServs}</div>`:''}
+          </div>
+          <div style="font-weight:600;font-family:'DM Mono',monospace;color:var(--success)">$${fmt(totalMesApto)}</div>
+        </div>`;
+      }
+    });
+    if(!filas) filas=`<div style="font-size:13px;color:var(--hint);padding:8px 0">Sin registros.</div>`;
+    c.innerHTML+=`<div class="apto-hist-card">
+      <div class="apto-hist-name">${apto.label}${isPrincipal?'<span class="principal-badge">principal</span>':''}</div>
+      ${filas}
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border);margin-top:6px">
+        <span style="font-size:12px;color:var(--muted)">Total acumulado</span>
+        <span style="font-size:15px;font-weight:600;font-family:'DM Mono',monospace;color:var(--accent)">$${fmt(totalApto)}</span>
+      </div>
+    </div>`;
+  });
+}
+
+function verDetalle(idx){
+  const h=historial[idx];
+  document.getElementById('hist-list').style.display='none';
+  document.getElementById('hist-detail').style.display='block';
+  renderDetalleHTML(idx);
+}
+
+function renderDetalleHTML(idx){
+  const h=historial[idx];
+  const sids=Object.keys(h.data||{});
+  const totalGen=sids.reduce((a,sid)=>{const d=h.data[sid];return a+(d?d.total:0)},0);
+  let html=`<button class="back-btn" onclick="renderListadoMeses()">‹ Volver</button>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+    <div>
+      <div style="font-size:18px;font-weight:600">${h.mes} ${h.anio}</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:2px">${cfg?cfg.aptos.length:''} apartamentos</div>
+    </div>
+    <button class="btn-sm" style="color:var(--danger);border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.08)" onclick="confirmarEliminarMes(${idx})">🗑️ Mes completo</button>
+  </div>
+  <div class="grand-card" style="margin-bottom:16px">
+    <div><div class="grand-label">Total todos los servicios</div></div>
+    <div class="grand-val">$${fmt(totalGen)}</div>
+  </div>`;
+
+  sids.forEach(sid=>{
+    const s=cfg&&cfg.svcs.find(x=>x.id===sid);
+    const d=h.data[sid]; if(!d)return;
+    const label=s?s.label:sid;
+    const colorStyle=s?svcColorStyle(s):'';
+    const isPartes=d.tipo==='partes';
+
+    html+=`<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:6px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="svc-badge" style="${colorStyle}">${label}</span>
+          ${isPartes
+            ?`<span style="font-size:12px;color:var(--muted)">➗ ${(d.aptosPartes||[]).length} partes</span>`
+            :`<span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace">$${fmt(d.tarifa)}/unid.</span>`}
+        </div>
+        <button class="btn-sm" style="color:var(--danger);border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.08);font-size:12px" onclick="confirmarEliminarSvc(${idx},'${sid}')">🗑️ Recibo</button>
+      </div>
+      <table class="det-table">
+        <thead><tr>
+          <th>Apartamento</th>
+          ${isPartes?'<th>Parte</th>':'<th>Unidades</th>'}
+          <th>A pagar</th>
+        </tr></thead><tbody>`;
+
+    if(isPartes){
+      const participantes=d.aptosPartes||[];
+      const n=participantes.length;
+      cfg.aptos.forEach(apto=>{
+        if(!participantes.includes(apto.id))return;
+        const isPrincipal=apto.id===cfg.aptos[0].id;
+        html+=`<tr>
+          <td>${apto.label}${isPrincipal?'<span class="principal-badge" style="font-size:9px">principal</span>':''}</td>
+          <td>1/${n}</td>
+          <td style="color:var(--success);font-weight:600">$${fmt(d.pagos[apto.id]||0)}</td>
+        </tr>`;
+      });
+    } else {
+      html+=`<tr>
+        <td>${cfg.aptos[0].label} <span class="principal-badge" style="font-size:9px">principal</span></td>
+        <td>${fmtDec(d.consumoPrincipal)}</td>
+        <td style="color:var(--success);font-weight:600">$${fmt(d.pagos[cfg.aptos[0].id]||0)}</td>
+      </tr>`;
+      cfg.aptos.slice(1).forEach(apto=>{
+        const lec=d.lecturas&&d.lecturas[apto.id]||{};
+        html+=`<tr>
+          <td>${apto.label}</td>
+          <td>${fmtDec(lec.consumo||0)}</td>
+          <td style="color:var(--success);font-weight:600">$${fmt(d.pagos[apto.id]||0)}</td>
+        </tr>`;
+      });
+    }
+    html+=`</tbody>
+      <tfoot><tr style="border-top:1px solid var(--border)">
+        <td style="font-weight:600;padding-top:8px">Total</td>
+        <td style="padding-top:8px;color:var(--muted)">${isPartes?'':fmtDec(d.cons)+' unid.'}</td>
+        <td style="padding-top:8px;font-weight:600;font-family:'DM Mono',monospace">$${fmt(d.total)}</td>
+      </tr></tfoot></table></div>`;
+  });
+
+  if(!sids.length) html+=`<div class="alert">No hay servicios guardados para este mes.</div>`;
+  document.getElementById('hist-detail').innerHTML=html;
+}
+
+function confirmarEliminarMes(idx){
+  const h=historial[idx];
+  openModal(`¿Eliminar todo el mes ${h.mes} ${h.anio}? Se borrarán todos los recibos.`,
+    ()=>{historial.splice(idx,1);persist();renderHistorial();}
+  );
+}
+function confirmarEliminarSvc(idx,sid){
+  const h=historial[idx];
+  const s=cfg&&cfg.svcs.find(x=>x.id===sid);
+  const label=s?s.label:sid;
+  openModal(`¿Eliminar el recibo de ${label} de ${h.mes} ${h.anio}?`,
+    ()=>{
+      delete h.data[sid];
+      if(!Object.keys(h.data).length) historial.splice(idx,1);
+      persist();
+      if(historial[idx]&&historial[idx].mes===h.mes) renderDetalleHTML(idx);
+      else renderHistorial();
+    }
+  );
+}
+
+/* ── INIT ── */
+load(); initMes();
+</script>
+</body>
+</html>
