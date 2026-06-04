@@ -597,12 +597,23 @@ function onMesCambio(){
 
 
 function getPrevLectura(sid,aptoId,mes,anio){
-  const mi=MESES.indexOf(mes), an=parseInt(anio);
-  const pm=mi===0?MESES[11]:MESES[mi-1], pa=mi===0?an-1:an;
-  const pe=getEntry(pm,String(pa));
-  if(pe&&pe.data&&pe.data[sid]&&pe.data[sid].lecturas){
-    const l=pe.data[sid].lecturas[aptoId];
-    if(l) return {val:l.act,found:true};
+  // Buscar el ultimo registro existente para este servicio (no necesariamente el mes anterior)
+  // Ordenar historial cronologicamente descendente y tomar el mas reciente antes del mes actual
+  const mesActualIdx=MESES.indexOf(mes)+parseInt(anio)*12;
+  const anteriores=[...historial]
+    .filter(h=>{
+      const idx=MESES.indexOf(h.mes)+parseInt(h.anio)*12;
+      return idx<mesActualIdx && h.data && h.data[sid] && h.data[sid].lecturas && h.data[sid].lecturas[aptoId];
+    })
+    .sort((a,b)=>{
+      const ai=MESES.indexOf(a.mes)+parseInt(a.anio)*12;
+      const bi=MESES.indexOf(b.mes)+parseInt(b.anio)*12;
+      return bi-ai; // descendente
+    });
+  if(anteriores.length){
+    const ultimo=anteriores[0];
+    const l=ultimo.data[sid].lecturas[aptoId];
+    if(l) return {val:l.act, found:true, deMes:ultimo.mes+' '+ultimo.anio};
   }
   return {val:'',found:false};
 }
@@ -616,7 +627,7 @@ function renderContadoresPanel(sid,mes,anio,saved){
       antVal=saved.lecturas[apto.id].ant; antLocked=true;
     } else {
       const prev=getPrevLectura(sid,apto.id,mes,anio);
-      if(prev.found){antVal=prev.val;antLocked=true;hint='🔒 Del mes anterior';}
+      if(prev.found){antVal=prev.val;antLocked=true;hint='🔒 De: '+(prev.deMes||'mes anterior');}
       else hint='⚠️ Sin datos previos — ingresa el valor inicial';
     }
     const actVal=saved&&saved.lecturas&&saved.lecturas[apto.id]?saved.lecturas[apto.id].act:'';
@@ -833,13 +844,28 @@ function switchSubtab(id,btn){
   else renderListadoMeses();
 }
 
+let _filtroAnioRecibo=String(new Date().getFullYear());
+
 function renderListadoMeses(){
   document.getElementById('hist-detail').style.display='none';
   document.getElementById('hist-by-apto').style.display='none';
   const list=document.getElementById('hist-list');
-  list.style.display='block'; list.innerHTML='';
-  [...historial].reverse().forEach((h,ri)=>{
-    const i=historial.length-1-ri;
+  list.style.display='block';
+
+  // Años disponibles
+  const aniosDisp=[...new Set(historial.map(h=>String(h.anio)))].sort();
+  if(!aniosDisp.includes(_filtroAnioRecibo)) _filtroAnioRecibo=aniosDisp[aniosDisp.length-1]||String(new Date().getFullYear());
+  const anioOpts=aniosDisp.map(a=>`<option${a===_filtroAnioRecibo?' selected':''}>${a}</option>`).join('');
+
+  list.innerHTML=`<div style="margin-bottom:12px">
+    <label style="font-size:11px;color:var(--muted);margin-bottom:4px;display:block">AÑO</label>
+    <select onchange="setFiltroReciboAnio(this.value)">${anioOpts}</select>
+  </div>`;
+
+  const histFiltrado=[...historial].filter(h=>String(h.anio)===_filtroAnioRecibo).reverse();
+  const offset=historial.length; // para mantener índice correcto
+  histFiltrado.forEach((h)=>{
+    const i=historial.indexOf(h);
     const sids=Object.keys(h.data||{});
     const totalGen=sids.reduce((a,sid)=>{const d=h.data[sid];return a+(d?d.total:0)},0);
     const svcsLabels=sids.map(sid=>{const s=cfg&&cfg.svcs.find(x=>x.id===sid);return s?s.label:sid}).join(' · ');
@@ -857,6 +883,12 @@ function renderListadoMeses(){
       ${isOpen?buildDetalleInline(i,h):''}
     </div>`;
   });
+}
+
+function setFiltroReciboAnio(anio){
+  _filtroAnioRecibo=anio;
+  _acordeonAbierto=null;
+  renderListadoMeses();
 }
 
 function buildDetalleInline(idx,h){
@@ -924,7 +956,8 @@ function buildDetalleInline(idx,h){
 }
 
 /* filtro global para la vista por apto */
-let _filtroGlobal='todos';
+let _filtroAnioApto=String(new Date().getFullYear());
+let _filtroMesApto=MESES[new Date().getMonth()];
 
 function renderPorApto(){
   document.getElementById('hist-list').style.display='none';
@@ -939,18 +972,26 @@ function renderPorApto(){
     return ai-bi;
   });
 
-  // Filtro global — un solo set de pills arriba de todos los aptos
-  const pillTodos=`<button class="mes-pill${_filtroGlobal==='todos'?' active':''}" onclick="setFiltroGlobal('todos')">Todos</button>`;
-  const pillsMeses=mesesOrdenados.map(h=>{
-    const key=h.mes+'_'+h.anio;
-    return `<button class="mes-pill${_filtroGlobal===key?' active':''}" onclick="setFiltroGlobal('${key}')">${h.mes.slice(0,3)} ${h.anio}</button>`;
-  }).join('');
+  // Años disponibles en historial
+  const aniosDisp=[...new Set(historial.map(h=>String(h.anio)))].sort();
+  if(!aniosDisp.includes(_filtroAnioApto)) _filtroAnioApto=aniosDisp[aniosDisp.length-1]||String(new Date().getFullYear());
 
-  c.innerHTML=`<div class="mes-filter" style="margin-bottom:16px">${pillTodos}${pillsMeses}</div>`;
+  // Meses disponibles para el año seleccionado
+  const mesesDisp=mesesOrdenados.filter(h=>String(h.anio)===_filtroAnioApto).map(h=>h.mes);
+  if(!mesesDisp.includes(_filtroMesApto)&&mesesDisp.length) _filtroMesApto=mesesDisp[mesesDisp.length-1];
 
-  const mesesFiltrados=_filtroGlobal==='todos'
-    ? mesesOrdenados
-    : mesesOrdenados.filter(h=>h.mes+'_'+h.anio===_filtroGlobal);
+  // Selectores año y mes
+  const anioOpts=aniosDisp.map(a=>`<option${a===_filtroAnioApto?' selected':''}>${a}</option>`).join('');
+  const mesOpts=MESES.map(m=>`<option${m===_filtroMesApto?' selected':''}>${m}</option>`).join('');
+
+  c.innerHTML=`<div style="display:flex;gap:8px;margin-bottom:16px">
+    <div style="flex:1"><label style="font-size:11px;color:var(--muted);margin-bottom:4px;display:block">AÑO</label>
+      <select onchange="setFiltroAptoAnio(this.value)" style="padding:8px 10px;font-size:13px">${anioOpts}</select></div>
+    <div style="flex:2"><label style="font-size:11px;color:var(--muted);margin-bottom:4px;display:block">MES</label>
+      <select onchange="setFiltroAptoMes(this.value)" style="padding:8px 10px;font-size:13px">${mesOpts}</select></div>
+  </div>`;
+
+  const mesesFiltrados=mesesOrdenados.filter(h=>String(h.anio)===_filtroAnioApto&&h.mes===_filtroMesApto);
 
   cfg.aptos.forEach((apto,ai)=>{
     const isPrincipal=ai===0;
@@ -993,17 +1034,21 @@ function renderPorApto(){
     c.innerHTML+=`<div class="apto-hist-card">
       <div class="apto-hist-name">${apto.label}${isPrincipal?'<span class="principal-badge">principal</span>':''}</div>
       ${tarjetas}
-      ${_filtroGlobal==='todos'?`<div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border);margin-top:6px">
-        <span style="font-size:12px;color:var(--muted)">Total acumulado</span>
-        <span style="font-size:15px;font-weight:600;font-family:'DM Mono',monospace;color:var(--accent)">$${fmt(totalAcumulado)}</span>
-      </div>`:''}
+
       <button class="share-btn" onclick="abrirCompartir('${aptoId}')">📤 Compartir resumen</button>
     </div>`;
   });
 }
 
-function setFiltroGlobal(mesKey){
-  _filtroGlobal=mesKey;
+function setFiltroAptoAnio(anio){
+  _filtroAnioApto=anio;
+  // Reset mes al primero disponible de ese año
+  const disp=historial.filter(h=>String(h.anio)===anio).map(h=>h.mes);
+  if(disp.length&&!disp.includes(_filtroMesApto)) _filtroMesApto=disp[0];
+  renderPorApto();
+}
+function setFiltroAptoMes(mes){
+  _filtroMesApto=mes;
   renderPorApto();
 }
 
@@ -1056,9 +1101,7 @@ function abrirCompartir(aptoId){
     const bi=MESES.indexOf(b.mes)+parseInt(b.anio)*12;
     return ai-bi;
   });
-  const mesesFiltrados=_filtroGlobal==='todos'
-    ?mesesOrdenados
-    :mesesOrdenados.filter(h=>h.mes+'_'+h.anio===_filtroGlobal);
+  const mesesFiltrados=mesesOrdenados.filter(h=>String(h.anio)===_filtroAnioApto&&h.mes===_filtroMesApto);
 
   let texto=`📋 Resumen de servicios — ${apto.label}\n`;
   texto+='─────────────────────\n';
